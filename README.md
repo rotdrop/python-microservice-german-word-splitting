@@ -105,6 +105,11 @@ This requires `curl`, `7z` (p7zip) and `iconv`, see [Prerequisites](#prerequisit
 uvicorn german_word_splitter.main:app --reload
 ```
 
+## Port
+
+The server port is read from `GERMAN_WORD_SPLITTER_PORT` and defaults to 8000.
+`make install PORT=9000` changes the default (the env variable still wins).
+
 ## API
 
 `POST /split` with `word` and optional `method` (`charsplit` (default) or

@@ -7,3 +7,4 @@ german.dic
 german.dic.7z
 german_utf8_linux.dic
 venv/
+src/german_word_splitter/_default_port.py

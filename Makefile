@@ -6,12 +6,17 @@ DICT_UTF8 := german_utf8_linux.dic
 VENV := venv
 PYTHON ?= python3
 SYSTEM_SITE_PACKAGES ?= 0
+PORT_FILE := src/german_word_splitter/_default_port.py
 VENV_OPTIONS := $(if $(filter 1 true yes,$(SYSTEM_SITE_PACKAGES)),--system-site-packages,)
 
-.PHONY: install venv dictionary uninstall clean-dictionary
+.PHONY: port install venv dictionary uninstall clean-dictionary
 
 # Create the virtual environment, install the package with test extras and fetch the dictionary.
-install: venv dictionary
+install: venv dictionary port
+
+# Record the default port if PORT is given (e.g. make install PORT=9000).
+port:
+	$(if $(PORT),echo "DEFAULT_PORT = $(PORT)" > $(PORT_FILE),@true)
 
 venv: $(VENV)/.installed
 
@@ -39,4 +44,4 @@ clean-dictionary:
 
 # Remove the virtual environment and the downloaded/converted dictionary files.
 uninstall: clean-dictionary
-	rm -rf $(VENV)
+	rm -rf $(VENV) $(PORT_FILE)
