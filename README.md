@@ -14,17 +14,27 @@ components. It wraps
 `iconv` is normally already present. Install the others with your
 distribution's package manager:
 
+**Debian / Ubuntu**
+
 ```sh
-# Debian / Ubuntu
 sudo apt install curl p7zip-full
+```
 
-# Fedora / RHEL (7z is provided by p7zip in EPEL on RHEL)
+**Fedora / RHEL** (7z is provided by p7zip in EPEL on RHEL)
+
+```sh
 sudo dnf install curl p7zip p7zip-plugins
+```
 
-# Arch Linux
+**Arch Linux**
+
+```sh
 sudo pacman -S curl p7zip
+```
 
-# Gentoo
+**Gentoo**
+
+```sh
 sudo emerge --ask net-misc/curl app-arch/p7zip
 ```
 
