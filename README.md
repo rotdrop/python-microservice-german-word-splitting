@@ -8,6 +8,26 @@ components. It wraps
 
 ## Install
 
+### Prerequisites
+
+`make install` (and `make dictionary`) needs `curl`, `7z` (p7zip) and `iconv`.
+`iconv` is normally already present. Install the others with your
+distribution's package manager:
+
+```sh
+# Debian / Ubuntu
+sudo apt install curl p7zip-full
+
+# Fedora / RHEL (7z is provided by p7zip in EPEL on RHEL)
+sudo dnf install curl p7zip p7zip-plugins
+
+# Arch Linux
+sudo pacman -S curl p7zip
+
+# Gentoo
+sudo emerge --ask net-misc/curl app-arch/p7zip
+```
+
 ### Virtual environment
 
 ```sh
@@ -57,7 +77,7 @@ extract it and convert it to UTF-8 with Unix line breaks (`german_utf8_linux.dic
 make dictionary
 ```
 
-This requires `curl`, `7z` (p7zip) and `iconv`. `make clean-dictionary` removes the dictionary files.
+This requires `curl`, `7z` (p7zip) and `iconv`, see [Prerequisites](#prerequisites). `make clean-dictionary` removes the dictionary files.
 
 ## Run
 
