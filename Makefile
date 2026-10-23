@@ -32,6 +32,7 @@ $(DICT_RAW): $(DICT_7Z)
 
 $(DICT_UTF8): $(DICT_RAW)
 	iconv -f ISO_8859-15 -t UTF-8 $(DICT_RAW) | tr -d '\r' > $@
+	rm -f $(DICT_7Z) $(DICT_RAW)
 
 clean-dictionary:
 	rm -f $(DICT_7Z) $(DICT_RAW) $(DICT_UTF8)
