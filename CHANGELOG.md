@@ -6,6 +6,8 @@ follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-10-23
+
 ### Added
 
 - FastAPI service with a `POST /split` endpoint for splitting German compound
