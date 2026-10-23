@@ -17,7 +17,7 @@ dependencies = [
 
 [project.optional-dependencies]
 test = [
-    "httpx>=0.24",
+    "httpx2>=2.0",
     "pytest>=7",
 ]
 
