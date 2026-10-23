@@ -130,7 +130,7 @@ An empty word or unknown method yields HTTP 400.
 ## Tests
 
 ```sh
-pytest
+make test
 ```
 
 ## Configuration
