@@ -20,9 +20,7 @@ def test_unknown_method(client):
 def test_real_charsplit_contract():
     import pytest
 
-    charsplit = pytest.importorskip("charsplit")
-    if not hasattr(charsplit, "Splitter"):
-        pytest.skip("installed charsplit does not provide Splitter")
+    pytest.importorskip("compound_split")
 
     from fastapi.testclient import TestClient
 

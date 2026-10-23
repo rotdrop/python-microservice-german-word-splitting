@@ -4,7 +4,7 @@ A small FastAPI service that splits German compound words into their
 components. It wraps
 
 - german_compound_splitter, Copyright 2020 by repodiac, see https://github.com/repodiac for updates and further information
-- https://github.com/dtuggener/CharSplit.git
+- compound-split (PyPI), a packaging of https://github.com/dtuggener/CharSplit
 
 ## Install
 
