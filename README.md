@@ -8,8 +8,31 @@ components. It wraps
 
 ## Install
 
+### Virtual environment
+
 ```sh
+python3 -m venv venv
+source venv/bin/activate        # Windows: venv\Scripts\activate
+pip install --upgrade pip
 pip install -e ".[test]"
+```
+
+Leave the environment with `deactivate`.
+
+### pipx
+
+The package has no console script of its own, so run `uvicorn` from an
+isolated pipx environment:
+
+```sh
+pipx run --spec . uvicorn german_word_splitter.main:app
+```
+
+Or install it persistently and expose `uvicorn` from its dependencies:
+
+```sh
+pipx install --include-deps .
+uvicorn german_word_splitter.main:app
 ```
 
 ## Run
