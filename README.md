@@ -51,7 +51,7 @@ extract it and convert it to UTF-8 with Unix line breaks (`german_utf8_linux.dic
 make dictionary
 ```
 
-This requires `curl`, `xz` and `iconv`. `make clean-dictionary` removes the files.
+This requires `curl`, `7z` (p7zip) and `iconv`. `make clean-dictionary` removes the files.
 
 ## Run
 
