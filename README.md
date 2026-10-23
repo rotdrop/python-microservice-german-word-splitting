@@ -156,7 +156,3 @@ make test
 | Variable | Default | Description |
 | --- | --- | --- |
 | `GERMAN_WORD_SPLITTER_DICTIONARY` | `german_utf8_linux.dic` | Dictionary file used by `german_compound_splitter` (created by `make dictionary`). |
-
-## Migration notes
-
-`app.py` was removed; use `german_word_splitter.main:app` instead.
