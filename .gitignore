@@ -12,3 +12,6 @@ src/german_word_splitter/_default_socket.py
 src/german_word_splitter/_default_dictionary.py
 .coverage
 build/
+vendor/
+coverage.xml
+coverage-php.xml
