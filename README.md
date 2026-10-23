@@ -23,6 +23,12 @@ Or in one step, which also builds the dictionary (see below):
 make install
 ```
 
+To remove the virtual environment and dictionary files:
+
+```sh
+make uninstall
+```
+
 Leave the environment with `deactivate`.
 
 ### pipx
@@ -51,7 +57,7 @@ extract it and convert it to UTF-8 with Unix line breaks (`german_utf8_linux.dic
 make dictionary
 ```
 
-This requires `curl`, `7z` (p7zip) and `iconv`. `make clean-dictionary` removes the files; `make uninstall` additionally removes `venv/`.
+This requires `curl`, `7z` (p7zip) and `iconv`. `make clean-dictionary` removes the dictionary files.
 
 ## Run
 
