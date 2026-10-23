@@ -7,16 +7,22 @@ VENV := venv
 PYTHON ?= python3
 SYSTEM_SITE_PACKAGES ?= 0
 PORT_FILE := src/german_word_splitter/_default_port.py
+SOCKET_FILE := src/german_word_splitter/_default_socket.py
+SOCKET_PATH := $(VENV)/run/german-word-splitter.sock
 VENV_OPTIONS := $(if $(filter 1 true yes,$(SYSTEM_SITE_PACKAGES)),--system-site-packages,)
 
-.PHONY: port install venv test dictionary uninstall clean-dictionary
+.PHONY: port socket install venv test dictionary uninstall clean-dictionary
 
 # Create the virtual environment, install the package with test extras and fetch the dictionary.
-install: venv dictionary port
+install: venv dictionary port socket
 
 # Record the default port if PORT is given (e.g. make install PORT=9000).
 port:
 	$(if $(PORT),echo "DEFAULT_PORT = $(PORT)" > $(PORT_FILE),@true)
+
+# Record a default Unix socket path if SOCKET is enabled.
+socket:
+	$(if $(filter 1 true yes,$(SOCKET)),mkdir -p $(VENV)/run && echo 'DEFAULT_SOCKET = "$(SOCKET_PATH)"' > $(SOCKET_FILE),rm -f $(SOCKET_FILE))
 
 venv: $(VENV)/.installed
 
@@ -47,4 +53,4 @@ clean-dictionary:
 
 # Remove the virtual environment and the downloaded/converted dictionary files.
 uninstall: clean-dictionary
-	rm -rf $(VENV) $(PORT_FILE)
+	rm -rf $(VENV) $(PORT_FILE) $(SOCKET_FILE)

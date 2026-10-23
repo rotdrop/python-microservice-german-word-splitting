@@ -16,6 +16,10 @@ app = create_app()
 if __name__ == "__main__":
     import uvicorn
 
-    from .config import get_port
+    from .config import get_port, get_socket
 
-    uvicorn.run(app, host="127.0.0.1", port=get_port())
+    socket_path = get_socket()
+    if socket_path:
+        uvicorn.run(app, uds=socket_path)
+    else:
+        uvicorn.run(app, host="127.0.0.1", port=get_port())

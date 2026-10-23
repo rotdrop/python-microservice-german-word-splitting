@@ -112,6 +112,22 @@ uvicorn german_word_splitter.main:app --reload
 The server port is read from `GERMAN_WORD_SPLITTER_PORT` and defaults to 8000.
 `make install PORT=9000` changes the default (the env variable still wins).
 
+## Unix domain socket
+
+As an alternative to TCP, enable a default Unix socket during installation:
+
+```sh
+make install SOCKET=1
+python -m german_word_splitter.main
+curl --unix-socket venv/run/german-word-splitter.sock http://localhost/docs
+```
+
+This creates `venv/run` and sets the default socket path to
+`venv/run/german-word-splitter.sock`. The `GERMAN_WORD_SPLITTER_SOCKET`
+environment variable overrides the default.
+
+Or directly with uvicorn: `uvicorn german_word_splitter.main:app --uds /path/to.sock`.
+
 ## API
 
 `POST /split` with `word` and optional `method` (`charsplit` (default) or
