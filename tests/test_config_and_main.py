@@ -23,6 +23,34 @@ def test_get_socket_generated_default(monkeypatch):
     assert config.get_socket() == "venv/run/x.sock"
 
 
+def test_get_socket_empty_env_uses_generated_default(monkeypatch):
+    monkeypatch.setenv(config.SOCKET_ENV, "")
+    monkeypatch.setattr(config, "DEFAULT_SOCKET", "venv/run/x.sock")
+    assert config.get_socket() == "venv/run/x.sock"
+
+
+def test_get_port_unset_uses_generated_default(monkeypatch):
+    monkeypatch.delenv(config.PORT_ENV, raising=False)
+    monkeypatch.setattr(config, "DEFAULT_PORT", 8123)
+    assert config.get_port() == 8123
+
+
+def test_get_port_env_overrides_default(monkeypatch):
+    monkeypatch.setattr(config, "DEFAULT_PORT", 8123)
+    monkeypatch.setenv(config.PORT_ENV, "9000")
+    assert config.get_port() == 9000
+
+
+def test_get_settings_unset_uses_default_dictionary(monkeypatch):
+    monkeypatch.delenv(config.DICTIONARY_ENV, raising=False)
+    assert config.get_settings().dictionary_path == config.DEFAULT_DICTIONARY
+
+
+def test_get_settings_env_overrides_default_dictionary(monkeypatch):
+    monkeypatch.setenv(config.DICTIONARY_ENV, "/data/custom.dic")
+    assert config.get_settings().dictionary_path == "/data/custom.dic"
+
+
 def test_generated_default_module_is_used(monkeypatch):
     import sys
 
