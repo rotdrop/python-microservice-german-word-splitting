@@ -78,18 +78,17 @@ Leave the environment with `deactivate`.
 
 ### pipx
 
-The package has no console script of its own, so run `uvicorn` from an
-isolated pipx environment:
+Run the service from an isolated pipx environment:
 
 ```sh
-pipx run --spec . uvicorn german_word_splitter.main:app
+pipx run --spec . german-word-splitter
 ```
 
-Or install it persistently and expose `uvicorn` from its dependencies:
+Or install it persistently:
 
 ```sh
 pipx install --include-deps .
-uvicorn german_word_splitter.main:app
+german-word-splitter
 ```
 
 ## Dictionary
@@ -109,7 +108,7 @@ This requires `curl`, `7z` (p7zip) and `iconv`, see [Prerequisites](#prerequisit
 ## Run
 
 ```sh
-uvicorn german_word_splitter.main:app --reload
+venv/bin/german-word-splitter
 ```
 
 ## Port

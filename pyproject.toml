@@ -15,6 +15,9 @@ dependencies = [
     "uvicorn>=0.23,<1.0",
 ]
 
+[project.scripts]
+german-word-splitter = "german_word_splitter.main:run"
+
 [project.optional-dependencies]
 test = [
     "httpx2>=2.0",
