@@ -9,7 +9,7 @@ description = "FastAPI microservice for splitting German compound words"
 readme = "README.md"
 requires-python = ">=3.9"
 dependencies = [
-    "charsplit>=0.1.2",
+    "compound-split>=1.0.2",
     "fastapi>=0.100,<1.0",
     "german_compound_splitter @ git+https://github.com/repodiac/german_compound_splitter.git",
     "uvicorn>=0.23,<1.0",

@@ -9,7 +9,7 @@ follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
 
 - FastAPI service with a `POST /split` endpoint for splitting German compound
-  words using `charsplit` or `german_compound_splitter`.
+  words using `compound-split` (`charsplit` method) or `german_compound_splitter`.
 
 ### Changed
 

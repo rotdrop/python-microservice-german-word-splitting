@@ -1,13 +1,13 @@
-"""Backend wrapping CharSplit."""
+"""Backend wrapping the compound-split package (char_split)."""
 
 from typing import List
 
 
 class CharsplitBackend:
     def __init__(self) -> None:
-        from charsplit import Splitter
+        from compound_split import char_split
 
-        self._splitter = Splitter()
+        self._splitter = char_split
 
     def split(self, word: str) -> List[str]:
         results = self._splitter.split_compound(word)
