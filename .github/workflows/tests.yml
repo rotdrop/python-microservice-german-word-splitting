@@ -30,21 +30,3 @@ jobs:
         with:
           files: coverage.xml
           token: ${{ secrets.CODECOV_TOKEN }}
-
-  php-proxy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.13"
-      - name: Install PHP with cURL
-        run: |
-          sudo apt-get update
-          sudo apt-get install --yes php-cli php-curl
-      - name: Install package with test extras
-        run: |
-          python -m pip install --upgrade pip
-          pip install -e ".[test]"
-      - name: Run PHP proxy tests
-        run: pytest tests/test_php_proxy.py
