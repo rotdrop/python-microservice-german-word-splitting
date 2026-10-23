@@ -73,6 +73,7 @@ $(DICT_7Z): | $(BUILD_DIR)
 
 $(DICT_RAW): $(DICT_7Z)
 	7z x -y -o$(BUILD_DIR) $(DICT_7Z) $(notdir $(DICT_RAW))
+	touch $@
 
 # Order-only: the converted dictionary is not rebuilt after make clean.
 $(DICT_UTF8): | $(DICT_DIR) $(DICT_RAW)
