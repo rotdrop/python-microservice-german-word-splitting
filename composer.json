@@ -1,0 +1,15 @@
+{
+    "name": "rotdrop/python-microservice-german-word-splitting",
+    "description": "Development tooling for the PHP proxy",
+    "type": "project",
+    "require": {
+        "php": ">=8.4",
+        "ext-curl": "*"
+    },
+    "require-dev": {
+        "phpunit/php-code-coverage": "^12.0"
+    },
+    "config": {
+        "sort-packages": true
+    }
+}

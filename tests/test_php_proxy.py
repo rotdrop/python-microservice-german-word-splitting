@@ -17,6 +17,7 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 PROXY = ROOT / "php" / "proxy.php"
+COVERAGE_PREPEND = ROOT / "tests" / "php" / "coverage_prepend.php"
 
 
 def _php_available() -> bool:
@@ -139,8 +140,11 @@ def _start_proxy(tmp_path, service_port, executable=None):
             "GERMAN_WORD_SPLITTER_SOCKET": "",
         }
     )
+    command = [php, "-S", f"127.0.0.1:{server_port}", "-t", str(PROXY.parent)]
+    if env.get("PHP_PROXY_COVERAGE_DIR"):
+        command[1:1] = ["-d", f"auto_prepend_file={COVERAGE_PREPEND}"]
     process = subprocess.Popen(
-        [php, "-S", f"127.0.0.1:{server_port}", "-t", str(PROXY.parent)],
+        command,
         env=env,
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
