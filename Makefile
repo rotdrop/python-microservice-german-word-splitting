@@ -2,6 +2,7 @@ DICT_URL := https://sourceforge.net/projects/germandict/files/latest/download
 DICT_7Z := german.dic.7z
 DICT_RAW := german.dic
 DICT_UTF8 := german_utf8_linux.dic
+.DEFAULT_GOAL := help
 
 VENV := venv
 PYTHON ?= python3
@@ -11,10 +12,29 @@ SOCKET_FILE := src/german_word_splitter/_default_socket.py
 SOCKET_PATH := $(VENV)/run/german-word-splitter.sock
 VENV_OPTIONS := $(if $(filter 1 true yes,$(SYSTEM_SITE_PACKAGES)),--system-site-packages,)
 
-.PHONY: port socket install venv test dictionary uninstall clean-dictionary
+.PHONY: port socket install venv test dictionary uninstall clean-dictionary help
 
 # Create the virtual environment, install the package with test extras and fetch the dictionary.
 install: venv dictionary port socket
+
+help:
+	@printf '%s\n' \
+		'Available targets:' \
+		'  install      Create the virtual environment, fetch the dictionary, and configure defaults.' \
+		'  venv         Create the virtual environment and install the package with test extras.' \
+		'  test         Run the test suite.' \
+		'  dictionary   Download and convert the German dictionary.' \
+		'  uninstall    Remove the virtual environment and dictionary files.' \
+		'  clean-dictionary  Remove downloaded and converted dictionary files.' \
+		'  port         Set the default port with PORT=<port> (for example, make install PORT=9000).' \
+		'  socket       Configure the default Unix socket when SOCKET=1.' \
+		'' \
+		'Options:' \
+		'  make install SOCKET=1' \
+		'      Enable the Unix socket at venv/run/german-word-splitter.sock.' \
+		'  make venv SYSTEM_SITE_PACKAGES=1' \
+		'      Create the virtual environment with access to system-installed Python packages.' \
+		'      This setting applies only when creating the environment; run make uninstall first to change it.'
 
 # Record the default port if PORT is given (e.g. make install PORT=9000).
 port:
