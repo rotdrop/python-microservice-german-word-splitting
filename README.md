@@ -65,7 +65,10 @@ make venv SYSTEM_SITE_PACKAGES=1
 This option applies when the environment is created. Run `make uninstall`
 first to recreate an existing environment with a different setting.
 
-To remove the virtual environment and dictionary files:
+The virtual environment lives in `venv` by default; use `make install VENV=/path/to/env`
+to put it elsewhere (pass the same `VENV` to every `make` call).
+
+To remove the virtual environment, dictionary and `build/`:
 
 ```sh
 make uninstall
@@ -93,13 +96,15 @@ uvicorn german_word_splitter.main:app
 
 `german_compound_splitter` needs an external dictionary. Download the
 [Free German Dictionary](https://sourceforge.net/projects/germandict/files/latest/download),
-extract it and convert it to UTF-8 with Unix line breaks (`german_utf8_linux.dic`):
+extract it and convert it to UTF-8 with Unix line breaks (`german_utf8_linux.dic`).
+The download and extraction happen in `build/`; the converted dictionary is stored in
+`$(VENV)/share/german-word-splitter/` (`venv/share/german-word-splitter/` by default):
 
 ```sh
 make dictionary
 ```
 
-This requires `curl`, `7z` (p7zip) and `iconv`, see [Prerequisites](#prerequisites). `make clean-dictionary` removes the dictionary files.
+This requires `curl`, `7z` (p7zip) and `iconv`, see [Prerequisites](#prerequisites). `make clean` removes `build/` (the downloaded archive and intermediate file) but keeps the virtual environment and the converted dictionary. `make install` records the absolute dictionary path as the default.
 
 ## Run
 
@@ -155,4 +160,4 @@ make test
 
 | Variable | Default | Description |
 | --- | --- | --- |
-| `GERMAN_WORD_SPLITTER_DICTIONARY` | `german_utf8_linux.dic` | Dictionary file used by `german_compound_splitter` (created by `make dictionary`). |
+| `GERMAN_WORD_SPLITTER_DICTIONARY` | `$(VENV)/share/german-word-splitter/german_utf8_linux.dic` (set by `make install`) | Dictionary file used by `german_compound_splitter` (created by `make dictionary`). |
