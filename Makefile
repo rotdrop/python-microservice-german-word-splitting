@@ -6,7 +6,7 @@ DICT_UTF8 := german_utf8_linux.dic
 VENV := venv
 PYTHON ?= python3
 
-.PHONY: install venv dictionary clean-dictionary
+.PHONY: install venv dictionary uninstall clean-dictionary
 
 # Create the virtual environment, install the package with test extras and fetch the dictionary.
 install: venv dictionary
@@ -33,3 +33,7 @@ $(DICT_UTF8): $(DICT_RAW)
 
 clean-dictionary:
 	rm -f $(DICT_7Z) $(DICT_RAW) $(DICT_UTF8)
+
+# Remove the virtual environment and the downloaded/converted dictionary files.
+uninstall: clean-dictionary
+	rm -rf $(VENV)
