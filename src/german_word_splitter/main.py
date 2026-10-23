@@ -3,6 +3,7 @@
 from fastapi import FastAPI
 
 from .api.routes import router
+from .config import get_port, get_socket
 
 
 def create_app() -> FastAPI:
@@ -13,9 +14,15 @@ def create_app() -> FastAPI:
 
 app = create_app()
 
-if __name__ == "__main__":
+def run() -> None:
     import uvicorn
 
-    from .config import get_port
+    socket_path = get_socket()
+    if socket_path:
+        uvicorn.run(app, uds=socket_path)
+    else:
+        uvicorn.run(app, host="127.0.0.1", port=get_port())
 
-    uvicorn.run(app, host="127.0.0.1", port=get_port())
+
+if __name__ == "__main__":  # pragma: no cover
+    run()
