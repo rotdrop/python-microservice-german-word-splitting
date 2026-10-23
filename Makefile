@@ -26,7 +26,7 @@ $(DICT_7Z):
 	curl -fL -o $@ "$(DICT_URL)"
 
 $(DICT_RAW): $(DICT_7Z)
-	7z x -y $(DICT_7Z)
+	7z x -y $(DICT_7Z) $(DICT_RAW)
 
 $(DICT_UTF8): $(DICT_RAW)
 	iconv -f ISO_8859-15 -t UTF-8 $(DICT_RAW) | tr -d '\r' > $@
