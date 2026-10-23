@@ -11,6 +11,19 @@ follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - FastAPI service with a `POST /split` endpoint for splitting German compound
   words using `charsplit` or `german_compound_splitter`.
 
+### Changed
+
+- Restructured into a `src/german_word_splitter` package (api, services,
+  backends, config, errors); `app.py` is removed, run
+  `uvicorn german_word_splitter.main:app`.
+- Backends are created once and cached instead of per request.
+- Dictionary path configurable via `GERMAN_WORD_SPLITTER_DICTIONARY`.
+- Service errors are mapped to HTTP 400 without leaking internals.
+
+### Added
+
+- pytest suite and README usage documentation.
+
 ## Release numbering
 
 - **MAJOR** versions include incompatible API changes.

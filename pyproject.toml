@@ -15,5 +15,15 @@ dependencies = [
     "uvicorn>=0.23,<1.0",
 ]
 
-[tool.setuptools]
-py-modules = ["app"]
+[project.optional-dependencies]
+test = [
+    "httpx>=0.24",
+    "pytest>=7",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
