@@ -5,6 +5,8 @@ DICT_UTF8 := german_utf8_linux.dic
 
 VENV := venv
 PYTHON ?= python3
+SYSTEM_SITE_PACKAGES ?= 0
+VENV_OPTIONS := $(if $(filter 1 true yes,$(SYSTEM_SITE_PACKAGES)),--system-site-packages,)
 
 .PHONY: install venv dictionary uninstall clean-dictionary
 
@@ -14,7 +16,7 @@ install: venv dictionary
 venv: $(VENV)/.installed
 
 $(VENV)/.installed: pyproject.toml
-	$(PYTHON) -m venv $(VENV)
+	$(PYTHON) -m venv $(VENV_OPTIONS) $(VENV)
 	$(VENV)/bin/pip install --upgrade pip
 	$(VENV)/bin/pip install -e ".[test]"
 	touch $@

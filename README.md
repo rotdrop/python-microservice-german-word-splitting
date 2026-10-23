@@ -53,6 +53,16 @@ Or in one step, which also builds the dictionary (see below):
 make install
 ```
 
+To create the virtual environment with access to system-installed Python
+packages, use:
+
+```sh
+make venv SYSTEM_SITE_PACKAGES=1
+```
+
+This option applies when the environment is created. Run `make uninstall`
+first to recreate an existing environment with a different setting.
+
 To remove the virtual environment and dictionary files:
 
 ```sh
