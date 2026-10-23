@@ -1,5 +1,5 @@
 DICT_URL := https://sourceforge.net/projects/germandict/files/latest/download
-DICT_XZ := german.dic.xz
+DICT_7Z := german.dic.7z
 DICT_RAW := german.dic
 DICT_UTF8 := german_utf8_linux.dic
 
@@ -22,14 +22,14 @@ $(VENV)/.installed: pyproject.toml
 # Download the Free German Dictionary and convert it to UTF-8 with Unix line breaks.
 dictionary: $(DICT_UTF8)
 
-$(DICT_XZ):
+$(DICT_7Z):
 	curl -fL -o $@ "$(DICT_URL)"
 
-$(DICT_RAW): $(DICT_XZ)
-	xz -dkf $(DICT_XZ)
+$(DICT_RAW): $(DICT_7Z)
+	7z x -y $(DICT_7Z)
 
 $(DICT_UTF8): $(DICT_RAW)
 	iconv -f ISO_8859-15 -t UTF-8 $(DICT_RAW) | tr -d '\r' > $@
 
 clean-dictionary:
-	rm -f $(DICT_XZ) $(DICT_RAW) $(DICT_UTF8)
+	rm -f $(DICT_7Z) $(DICT_RAW) $(DICT_UTF8)

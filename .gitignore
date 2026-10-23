@@ -4,6 +4,6 @@ __pycache__/
 
 # Dictionary build artifacts
 german.dic
-german.dic.xz
+german.dic.7z
 german_utf8_linux.dic
 venv/
