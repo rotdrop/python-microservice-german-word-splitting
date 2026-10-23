@@ -13,6 +13,9 @@ follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
+- `make dictionary` downloads, extracts and converts the Free German Dictionary;
+  the default dictionary is now `german_utf8_linux.dic`.
+
 - Restructured into a `src/german_word_splitter` package (api, services,
   backends, config, errors); `app.py` is removed, run
   `uvicorn german_word_splitter.main:app`.

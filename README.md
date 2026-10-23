@@ -17,6 +17,12 @@ pip install --upgrade pip
 pip install -e ".[test]"
 ```
 
+Or in one step, which also builds the dictionary (see below):
+
+```sh
+make install
+```
+
 Leave the environment with `deactivate`.
 
 ### pipx
@@ -34,6 +40,18 @@ Or install it persistently and expose `uvicorn` from its dependencies:
 pipx install --include-deps .
 uvicorn german_word_splitter.main:app
 ```
+
+## Dictionary
+
+`german_compound_splitter` needs an external dictionary. Download the
+[Free German Dictionary](https://sourceforge.net/projects/germandict/files/latest/download),
+extract it and convert it to UTF-8 with Unix line breaks (`german_utf8_linux.dic`):
+
+```sh
+make dictionary
+```
+
+This requires `curl`, `xz` and `iconv`. `make clean-dictionary` removes the files.
 
 ## Run
 
@@ -68,7 +86,7 @@ pytest
 
 | Variable | Default | Description |
 | --- | --- | --- |
-| `GERMAN_WORD_SPLITTER_DICTIONARY` | `german.dic` | Dictionary file used by `german_compound_splitter`. |
+| `GERMAN_WORD_SPLITTER_DICTIONARY` | `german_utf8_linux.dic` | Dictionary file used by `german_compound_splitter` (created by `make dictionary`). |
 
 ## Migration notes
 

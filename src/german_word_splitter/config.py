@@ -4,7 +4,7 @@ import os
 from dataclasses import dataclass
 
 DICTIONARY_ENV = "GERMAN_WORD_SPLITTER_DICTIONARY"
-DEFAULT_DICTIONARY = "german.dic"
+DEFAULT_DICTIONARY = "german_utf8_linux.dic"
 
 
 @dataclass(frozen=True)
