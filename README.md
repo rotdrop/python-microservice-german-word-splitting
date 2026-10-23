@@ -1,5 +1,7 @@
 # Simple Python Microservice for German Compound-Words Splitting
 
+[![codecov](https://codecov.io/gh/rotdrop/python-microservice-german-word-splitting/graph/badge.svg)](https://codecov.io/gh/rotdrop/python-microservice-german-word-splitting)
+
 A small FastAPI service that splits German compound words into their
 components. It wraps
 
