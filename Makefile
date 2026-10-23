@@ -9,7 +9,7 @@ SYSTEM_SITE_PACKAGES ?= 0
 PORT_FILE := src/german_word_splitter/_default_port.py
 VENV_OPTIONS := $(if $(filter 1 true yes,$(SYSTEM_SITE_PACKAGES)),--system-site-packages,)
 
-.PHONY: port install venv dictionary uninstall clean-dictionary
+.PHONY: port install venv test dictionary uninstall clean-dictionary
 
 # Create the virtual environment, install the package with test extras and fetch the dictionary.
 install: venv dictionary port
@@ -19,6 +19,9 @@ port:
 	$(if $(PORT),echo "DEFAULT_PORT = $(PORT)" > $(PORT_FILE),@true)
 
 venv: $(VENV)/.installed
+
+test: venv
+	$(VENV)/bin/pytest
 
 $(VENV)/.installed: pyproject.toml
 	$(PYTHON) -m venv $(VENV_OPTIONS) $(VENV)
