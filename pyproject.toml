@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "python-microservice-german-word-splitting"
+version = "0.1.0"
+description = "FastAPI microservice for splitting German compound words"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "charsplit>=0.1.2",
+    "fastapi>=0.100,<1.0",
+    "german_compound_splitter @ git+https://github.com/repodiac/german_compound_splitter.git",
+    "uvicorn>=0.23,<1.0",
+]
+
+[tool.setuptools]
+py-modules = ["app"]
