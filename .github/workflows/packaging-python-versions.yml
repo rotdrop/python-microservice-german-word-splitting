@@ -1,0 +1,77 @@
+name: Packaging Python versions
+
+# Keeps the Python version requirements of the Gentoo, Debian, RPM and Arch
+# packaging and of pyproject.toml in sync with the Python version matrix of
+# the test job in tests.yml. The oldest tested version becomes the minimum.
+on:
+  push:
+    paths:
+      - .github/workflows/tests.yml
+      - .github/workflows/packaging-python-versions.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    # Tags are not branches and cannot be pushed to.
+    if: github.ref_type == 'branch'
+    steps:
+      - uses: actions/checkout@v5
+      - name: Update Python requirements from the test matrix
+        run: |
+          pip install pyyaml
+          python - <<'EOF'
+          import glob
+          import re
+          import yaml
+
+          with open(".github/workflows/tests.yml") as f:
+              workflow = yaml.safe_load(f)
+          versions = workflow["jobs"]["test"]["strategy"]["matrix"]["python-version"]
+          parsed = sorted({tuple(int(p) for p in str(v).split(".")[:2]) for v in versions})
+          minimum = "{}.{}".format(*parsed[0])
+          minors = [m for _, m in parsed]
+
+          if minors == list(range(minors[0], minors[-1] + 1)) and len(minors) > 1:
+              compat = f"python3_{{{minors[0]}..{minors[-1]}}}"
+          else:
+              compat = " ".join(f"python3_{m}" for m in minors)
+
+          # (file glob, pattern, replacement)
+          rules = [
+              ("contrib/gentoo/*/*/*.ebuild",
+               r"^PYTHON_COMPAT=\(.*\)$", f"PYTHON_COMPAT=( {compat} )"),
+              ("contrib/debian/control",
+               r"python3 \(>= [0-9.]+\)", f"python3 (>= {minimum})"),
+              ("contrib/rpm/*.spec",
+               r"^((?:Build)?Requires:\s+)python3(?: >= [0-9.]+)?$",
+               rf"\g<1>python3 >= {minimum}"),
+              ("contrib/arch/PKGBUILD",
+               r"^depends=\('python(?:>=[0-9.]+)?'", f"depends=('python>={minimum}'"),
+              ("pyproject.toml",
+               r'^requires-python = ">=[0-9.]+"', f'requires-python = ">={minimum}"'),
+          ]
+
+          for pattern_glob, regex, replacement in rules:
+              for path in glob.glob(pattern_glob):
+                  with open(path) as f:
+                      text = f.read()
+                  updated = re.sub(regex, replacement, text, flags=re.M)
+                  if updated != text:
+                      with open(path, "w") as f:
+                          f.write(updated)
+                      print(f"Updated {path}")
+          EOF
+      - name: Commit and push changes
+        run: |
+          if git diff --quiet; then
+            echo "Packaging already matches the test matrix."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "Align packaging Python versions with the test matrix"
+          git push
