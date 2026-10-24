@@ -1,4 +1,9 @@
 # Install as /etc/default/german-word-splitter
 #GERMAN_WORD_SPLITTER_PORT=8000
+# Port 0 lets the kernel choose a free port; read it from the port file.
+#GERMAN_WORD_SPLITTER_PORT_FILE=/run/german-word-splitter/port
 #GERMAN_WORD_SPLITTER_SOCKET=/run/german-word-splitter/german-word-splitter.sock
+# Permission bits (octal) of the socket. Default 660: add clients to the
+# german-word-splitter group, or use 666 to allow every local user.
+#GERMAN_WORD_SPLITTER_SOCKET_MODE=660
 #GERMAN_WORD_SPLITTER_DICTIONARY=/opt/german-word-splitter/venv/share/german-word-splitter/german_utf8_linux.dic
