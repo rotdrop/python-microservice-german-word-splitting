@@ -232,3 +232,21 @@ The system user and group are created via `sysusers.d` (`contrib/german-word-spl
 
 Both packages install the same layout as the Debian package and keep the version in sync with
 `pyproject.toml` (update `pkgver` and `Version:` on release).
+
+`contrib/gentoo/` is a complete ebuild repository (overlay) named `german-word-splitter`.
+`eselect repository add` can only clone a repository whose root is an overlay, so use a
+local checkout instead:
+
+```sh
+git clone https://github.com/rotdrop/python-microservice-german-word-splitting
+sudo eselect repository create german-word-splitter   # creates /var/db/repos/german-word-splitter
+sudo rm -rf /var/db/repos/german-word-splitter
+sudo ln -s "$PWD/python-microservice-german-word-splitting/contrib/gentoo" /var/db/repos/german-word-splitter
+sudo emerge --ask app-misc/german-word-splitter
+```
+
+Alternatively publish the directory as its own branch with
+`git subtree split --prefix=contrib/gentoo -b gentoo` and add that branch with
+`eselect repository add german-word-splitter git <url>`, which only works if the branch
+is used as the repository's default branch (or via `sync-git-clone-extra-opts = --branch gentoo`
+in `repos.conf`).
