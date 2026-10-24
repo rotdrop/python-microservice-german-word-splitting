@@ -1,7 +1,7 @@
 name: APT repository
 
 # Builds the .deb for Debian trixie and Ubuntu noble (24.04) and resolute (26.04) on amd64 and arm64
-# and publishes a signed apt repository on GitHub Pages.
+# and publishes a signed apt repository on GitHub Pages, keeping the three most recent releases.
 on:
   push:
     tags: ['v*']
@@ -68,6 +68,20 @@ jobs:
           pattern: debs-*
           path: dist
           merge-multiple: true
+      - uses: actions/configure-pages@v5
+        id: pages
+      - name: Fetch previously published packages
+        run: |
+          # Seed dist/ with the .debs already published so that older releases are kept.
+          base="${{ steps.pages.outputs.base_url }}"
+          for suite in $(ls dist); do
+            for arch in amd64 arm64; do
+              curl -fsSL "$base/dists/$suite/main/binary-$arch/Packages" -o /tmp/Packages || continue
+              sed -n 's/^Filename: //p' /tmp/Packages | while read -r f; do
+                [ -e "dist/$suite/$(basename "$f")" ] || curl -fsSL -o "dist/$suite/$(basename "$f")" "$base/$f"
+              done
+            done
+          done
       - name: Build the signed repository
         env:
           GPG_PRIVATE_KEY: ${{ secrets.APT_GPG_PRIVATE_KEY }}
@@ -76,7 +90,6 @@ jobs:
           printf '%s\n' "$GPG_PRIVATE_KEY" | gpg --batch --import
           export GPG_KEY_ID=$(gpg --list-secret-keys --with-colons | awk -F: '/^fpr/ {print $10; exit}')
           contrib/apt/build-repo.sh dist public
-      - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
           path: public
