@@ -23,9 +23,11 @@ DEFAULTS_DIR ?= /etc/default
 DEB_DIR := $(BUILD_DIR)/deb
 DEB_VERSION = $(shell sed -n '1s/^[^(]*(\([^)]*\)).*/\1/p' contrib/debian/changelog)
 DEB_SRC = $(DEB_DIR)/$(SERVICE_NAME)-$(DEB_VERSION)
+PKG_VERSION := $(shell sed -n 's/^version = "\(.*\)"/\1/p' pyproject.toml)
+RPM_DIR := $(BUILD_DIR)/rpm
 VENV_OPTIONS := $(if $(filter 1 true yes,$(SYSTEM_SITE_PACKAGES)),--system-site-packages,)
 
-.PHONY: port socket dictionary-default install venv test dictionary uninstall clean help install-service uninstall-service deb-build-deps deb deb-clean
+.PHONY: port socket dictionary-default install venv test dictionary uninstall clean help install-service uninstall-service deb-build-deps deb deb-clean rpm-build-deps rpm rpm-clean
 
 # Create the virtual environment, install the package with test extras and fetch the dictionary.
 install: venv dictionary dictionary-default port socket
@@ -42,6 +44,9 @@ help:
 		'  deb-build-deps   Install the Debian build dependencies with mk-build-deps (uses sudo).' \
 		'  deb              Build the Debian package from contrib/debian into $(DEB_DIR)/.' \
 		'  deb-clean        Remove $(DEB_DIR)/.' \
+		'  rpm-build-deps   Install the RPM build dependencies with dnf (Fedora/RHEL, uses sudo).' \
+		'  rpm              Build the RPM from contrib/rpm into $(RPM_DIR)/.' \
+		'  rpm-clean        Remove $(RPM_DIR)/.' \
 		'  uninstall    Remove the virtual environment and dictionary files.' \
 		'  clean        Remove the build/ directory with the download artifacts; keeps the virtual environment.' \
 				'  port         Set the default port with PORT=<port> (for example, make install PORT=9000).' \
@@ -151,3 +156,23 @@ deb:
 
 deb-clean:
 	rm -rf $(DEB_DIR)
+
+# Source tarball of the tracked and unignored files, as expected by the RPM package.
+define source_tarball
+mkdir -p $(dir $(1))
+git ls-files -z --cached --others --exclude-standard | tar --null -T - --transform 's|^|$(SERVICE_NAME)-$(PKG_VERSION)/|' -czf $(1)
+endef
+
+# Install the build dependencies listed in the spec file (needs dnf-plugins-core).
+rpm-build-deps:
+	$(SUDO) dnf builddep -y contrib/rpm/$(SERVICE_NAME).spec
+
+# Build the RPM from contrib/rpm/. The version is taken from pyproject.toml and must match the spec file. Needs network access.
+rpm:
+	rm -rf $(RPM_DIR)
+	$(call source_tarball,$(RPM_DIR)/SOURCES/$(SERVICE_NAME)-$(PKG_VERSION).tar.gz)
+	rpmbuild -bb --define '_topdir $(abspath $(RPM_DIR))' contrib/rpm/$(SERVICE_NAME).spec
+	@ls $(RPM_DIR)/RPMS/*/*.rpm
+
+rpm-clean:
+	rm -rf $(RPM_DIR)

@@ -203,3 +203,17 @@ The package installs below `/opt/german-word-splitter`, creates the system user 
 `german-word-splitter` (kept on removal), installs the systemd unit and
 `/etc/default/german-word-splitter`. `make deb-clean` removes `build/deb/`. The package
 version is taken from `contrib/debian/changelog`.
+
+### Fedora / RHEL package
+
+The RPM spec lives in `contrib/rpm/`. Run these on Fedora or RHEL (needs network access during the build):
+
+```sh
+sudo dnf install rpm-build dnf-plugins-core
+make rpm-build-deps   # dnf builddep (uses sudo)
+make rpm              # writes build/rpm/RPMS/<arch>/german-word-splitter-*.rpm
+sudo dnf install build/rpm/RPMS/*/german-word-splitter-*.rpm
+```
+
+On RHEL, `p7zip` and `p7zip-plugins` come from EPEL. The version is taken from `pyproject.toml`
+and must match `Version:` in the spec file. `make rpm-clean` removes `build/rpm/`.
