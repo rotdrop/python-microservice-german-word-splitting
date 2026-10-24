@@ -26,9 +26,13 @@ DEB_SRC = $(DEB_DIR)/$(SERVICE_NAME)-$(DEB_VERSION)
 PKG_VERSION := $(shell sed -n 's/^version = "\(.*\)"/\1/p' pyproject.toml)
 RPM_DIR := $(BUILD_DIR)/rpm
 ARCH_DIR := $(BUILD_DIR)/arch
+APT_URI ?= https://rotdrop.github.io/python-microservice-german-word-splitting
+APT_SUITE ?= $(shell . /etc/os-release; echo $$VERSION_CODENAME)
+APT_KEYRING_DIR ?= /etc/apt/keyrings
+APT_SOURCES_DIR ?= /etc/apt/sources.list.d
 VENV_OPTIONS := $(if $(filter 1 true yes,$(SYSTEM_SITE_PACKAGES)),--system-site-packages,)
 
-.PHONY: port socket dictionary-default install venv test dictionary uninstall clean help install-service uninstall-service deb-build-deps deb deb-clean rpm-build-deps rpm rpm-clean arch arch-clean
+.PHONY: port socket dictionary-default install venv test dictionary uninstall clean help install-service uninstall-service deb-build-deps deb deb-clean rpm-build-deps rpm rpm-clean arch arch-clean install-apt-source uninstall-apt-source
 
 # Create the virtual environment, install the package with test extras and fetch the dictionary.
 install: venv dictionary dictionary-default port socket
@@ -50,6 +54,8 @@ help:
 		'  rpm-clean        Remove $(RPM_DIR)/.' \
 		'  arch             Build the Arch Linux package from contrib/arch into $(ARCH_DIR)/ (makepkg).' \
 		'  arch-clean       Remove $(ARCH_DIR)/.' \
+		'  install-apt-source    Add the project apt repository for this Debian/Ubuntu release (uses sudo).' \
+		'  uninstall-apt-source  Remove the apt repository configuration and key again.' \
 		'  uninstall    Remove the virtual environment and dictionary files.' \
 		'  clean        Remove the build/ directory with the download artifacts; keeps the virtual environment.' \
 				'  port         Set the default port with PORT=<port> (for example, make install PORT=9000).' \
@@ -190,3 +196,15 @@ arch:
 
 arch-clean:
 	rm -rf $(ARCH_DIR)
+
+# Register the project's signed apt repository (deb822 format). The suite is the distribution codename.
+install-apt-source:
+	$(SUDO) install -d -m 0755 $(APT_KEYRING_DIR) $(APT_SOURCES_DIR)
+	curl -fsSL $(APT_URI)/$(SERVICE_NAME).asc | $(SUDO) tee $(APT_KEYRING_DIR)/$(SERVICE_NAME).asc >/dev/null
+	printf '%s\n' 'Types: deb' 'URIs: $(APT_URI)' 'Suites: $(APT_SUITE)' 'Components: main' \
+		'Signed-By: $(APT_KEYRING_DIR)/$(SERVICE_NAME).asc' \
+		| $(SUDO) tee $(APT_SOURCES_DIR)/$(SERVICE_NAME).sources >/dev/null
+	@echo "Now run: $(SUDO) apt update && $(SUDO) apt install $(SERVICE_NAME)"
+
+uninstall-apt-source:
+	$(SUDO) rm -f $(APT_SOURCES_DIR)/$(SERVICE_NAME).sources $(APT_KEYRING_DIR)/$(SERVICE_NAME).asc

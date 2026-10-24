@@ -204,6 +204,37 @@ The package installs below `/opt/german-word-splitter`, creates the system user 
 `/etc/default/german-word-splitter`. `make deb-clean` removes `build/deb/`. The package
 version is taken from `contrib/debian/changelog`.
 
+#### Signed apt repository
+
+Release builds for Debian stable and the current Ubuntu LTS (amd64 and arm64) are published as a signed apt
+repository on GitHub Pages by the `APT repository` workflow (on `v*` tags or manual start).
+The suite is the distribution codename. Add the repository with
+
+```sh
+make install-apt-source          # uses sudo; APT_SUITE=<codename> overrides the detected release
+sudo apt update
+sudo apt install german-word-splitter
+```
+
+or by hand:
+
+```sh
+sudo install -d -m 0755 /etc/apt/keyrings
+sudo curl -fsSL -o /etc/apt/keyrings/german-word-splitter.asc \
+  https://rotdrop.github.io/python-microservice-german-word-splitting/german-word-splitter.asc
+sudo tee /etc/apt/sources.list.d/german-word-splitter.sources <<EOF
+Types: deb
+URIs: https://rotdrop.github.io/python-microservice-german-word-splitting
+Suites: $(. /etc/os-release; echo $VERSION_CODENAME)
+Components: main
+Signed-By: /etc/apt/keyrings/german-word-splitter.asc
+EOF
+```
+
+`make uninstall-apt-source` removes both files again. The repository is built by
+`contrib/apt/build-repo.sh` and needs the repository secret `APT_GPG_PRIVATE_KEY` (a passphrase-less
+signing key) and GitHub Pages with the "GitHub Actions" source.
+
 ### Fedora / RHEL package
 
 The RPM spec lives in `contrib/rpm/`. Run these on Fedora or RHEL (needs network access during the build):
