@@ -7,7 +7,10 @@
  *
  * Configuration via environment variables (or edit the defaults below):
  *   GERMAN_WORD_SPLITTER_BIN     path to the executable
- *   GERMAN_WORD_SPLITTER_PORT    TCP port (default 8000)
+ *   GERMAN_WORD_SPLITTER_PORT    TCP port (default 8000); 0 lets the service
+ *                                pick a free port, which is read from the port file
+ *   GERMAN_WORD_SPLITTER_PORT_FILE  file holding the effective port when the port
+ *                                is 0 (default: a file in the system temp dir)
  *   GERMAN_WORD_SPLITTER_SOCKET  Unix socket path; if set, used instead of TCP
  *   GERMAN_WORD_SPLITTER_LOG     log file of the launched service
  *
@@ -17,8 +20,11 @@
  */
 
 $bin    = getenv('GERMAN_WORD_SPLITTER_BIN') ?: __DIR__ . '/../venv/bin/german-word-splitter';
-$port   = (int)(getenv('GERMAN_WORD_SPLITTER_PORT') ?: 8000);
+$port   = (int)(getenv('GERMAN_WORD_SPLITTER_PORT') !== false
+    && getenv('GERMAN_WORD_SPLITTER_PORT') !== '' ? getenv('GERMAN_WORD_SPLITTER_PORT') : 8000);
 $socket = getenv('GERMAN_WORD_SPLITTER_SOCKET') ?: '';
+$portFile = getenv('GERMAN_WORD_SPLITTER_PORT_FILE')
+    ?: sys_get_temp_dir() . '/german-word-splitter-' . md5($bin) . '.port';
 $log    = getenv('GERMAN_WORD_SPLITTER_LOG') ?: '/dev/null';
 $startupTimeout = 60; // seconds; the dictionary load can be slow
 
@@ -30,8 +36,21 @@ function fail(int $code, string $msg): void
     exit;
 }
 
+// With port 0 the effective port is whatever the service wrote to the port file.
+function effectivePort(int $port, string $portFile): int
+{
+    if ($port !== 0) {
+        return $port;
+    }
+    $content = @file_get_contents($portFile);
+    return $content === false ? 0 : (int)trim($content);
+}
+
 function serviceUp(string $socket, int $port): bool
 {
+    if ($socket === '' && $port === 0) {
+        return false;
+    }
     $addr = $socket !== '' ? 'unix://' . $socket : "tcp://127.0.0.1:$port";
     $fp = @stream_socket_client($addr, $errno, $errstr, 1);
     if ($fp === false) {
@@ -41,15 +60,19 @@ function serviceUp(string $socket, int $port): bool
     return true;
 }
 
-function launch(string $bin, string $port, string $socket, string $log): void
+function launch(string $bin, int $port, string $portFile, string $socket, string $log): void
 {
     if (!is_executable($bin)) {
         fail(502, 'Service executable not found or not executable.');
     }
     $lock = fopen(sys_get_temp_dir() . '/german-word-splitter-' . md5($bin) . '.lock', 'c');
     flock($lock, LOCK_EX); // serialize concurrent launches
-    if (!serviceUp($socket, (int)$port)) {
-        $env = 'GERMAN_WORD_SPLITTER_PORT=' . escapeshellarg($port);
+    if (!serviceUp($socket, effectivePort($port, $portFile))) {
+        if ($port === 0 && $socket === '') {
+            @unlink($portFile); // drop a stale file from a dead instance
+        }
+        $env = 'GERMAN_WORD_SPLITTER_PORT=' . escapeshellarg((string)$port)
+            . ' GERMAN_WORD_SPLITTER_PORT_FILE=' . escapeshellarg($portFile);
         if ($socket !== '') {
             $env .= ' GERMAN_WORD_SPLITTER_SOCKET=' . escapeshellarg($socket);
         }
@@ -60,10 +83,10 @@ function launch(string $bin, string $port, string $socket, string $log): void
     fclose($lock);
 }
 
-if (!serviceUp($socket, $port)) {
-    launch($bin, (string)$port, $socket, $log);
+if (!serviceUp($socket, effectivePort($port, $portFile))) {
+    launch($bin, $port, $portFile, $socket, $log);
     $deadline = time() + $startupTimeout;
-    while (!serviceUp($socket, $port)) {
+    while (!serviceUp($socket, effectivePort($port, $portFile))) {
         if (time() > $deadline) {
             fail(504, 'Service did not start in time.');
         }
@@ -74,6 +97,7 @@ if (!serviceUp($socket, $port)) {
 // The service is up; lift the execution limit so startup time doesn't count.
 // The upstream request is still bounded by CURLOPT_TIMEOUT.
 set_time_limit(0);
+$port = effectivePort($port, $portFile);
 
 $path = $_SERVER['PATH_INFO'] ?? ($_GET['path'] ?? '/');
 $path = '/' . ltrim($path, '/');

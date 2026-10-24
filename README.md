@@ -115,6 +115,10 @@ venv/bin/german-word-splitter
 
 The server port is read from `GERMAN_WORD_SPLITTER_PORT` and defaults to 8000.
 `make install PORT=9000` changes the default (the env variable still wins).
+Set `GERMAN_WORD_SPLITTER_PORT=0` to let the kernel pick a free port; the chosen
+port is written to the file named by `GERMAN_WORD_SPLITTER_PORT_FILE`, which
+`php/proxy.php` reads automatically. For a Unix socket, its permission bits
+(octal, default 660) are set with `GERMAN_WORD_SPLITTER_SOCKET_MODE`.
 
 ## Unix domain socket
 
