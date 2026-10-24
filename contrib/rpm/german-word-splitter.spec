@@ -8,7 +8,7 @@
 %global dict german_utf8_linux.dic
 
 Name:           german-word-splitter
-Version:        0.1.0
+Version:        0.2.0
 Release:        1%{?dist}
 Summary:        FastAPI microservice for splitting German compound words
 License:        AGPL-3.0-or-later
@@ -79,5 +79,8 @@ exit 0
 %config(noreplace) %{_sysconfdir}/default/%{name}
 
 %changelog
+* Sat Oct 24 2026 rotdrop <1494769+rotdrop@users.noreply.github.com> - 0.2.0-1
+- Update to 0.2.0.
+
 * Sat Oct 24 2026 rotdrop <1494769+rotdrop@users.noreply.github.com> - 0.1.0-1
 - Initial RPM package.
