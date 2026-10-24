@@ -20,9 +20,12 @@ SERVICE_GROUP ?= german-word-splitter
 SUDO ?= sudo
 SYSTEMD_DIR ?= /etc/systemd/system
 DEFAULTS_DIR ?= /etc/default
+DEB_DIR := $(BUILD_DIR)/deb
+DEB_VERSION = $(shell sed -n '1s/^[^(]*(\([^)]*\)).*/\1/p' contrib/debian/changelog)
+DEB_SRC = $(DEB_DIR)/$(SERVICE_NAME)-$(DEB_VERSION)
 VENV_OPTIONS := $(if $(filter 1 true yes,$(SYSTEM_SITE_PACKAGES)),--system-site-packages,)
 
-.PHONY: port socket dictionary-default install venv test dictionary uninstall clean help install-service uninstall-service
+.PHONY: port socket dictionary-default install venv test dictionary uninstall clean help install-service uninstall-service deb-build-deps deb deb-clean
 
 # Create the virtual environment, install the package with test extras and fetch the dictionary.
 install: venv dictionary dictionary-default port socket
@@ -36,6 +39,9 @@ help:
 		'  dictionary   Download and convert the German dictionary.' \
 		'  install-service  Install the systemd service under $(PREFIX) (uses sudo; see SUDO, PREFIX).' \
 		'  uninstall-service  Revert install-service: remove unit, $(PREFIX), defaults file, user and group (uses sudo).' \
+		'  deb-build-deps   Install the Debian build dependencies with mk-build-deps (uses sudo).' \
+		'  deb              Build the Debian package from contrib/debian into $(DEB_DIR)/.' \
+		'  deb-clean        Remove $(DEB_DIR)/.' \
 		'  uninstall    Remove the virtual environment and dictionary files.' \
 		'  clean        Remove the build/ directory with the download artifacts; keeps the virtual environment.' \
 				'  port         Set the default port with PORT=<port> (for example, make install PORT=9000).' \
@@ -127,3 +133,21 @@ uninstall-service:
 	$(SUDO) rm -rf -- $(PREFIX)
 	if getent passwd $(SERVICE_USER) >/dev/null; then $(SUDO) userdel $(SERVICE_USER); fi
 	if getent group $(SERVICE_GROUP) >/dev/null; then $(SUDO) groupdel $(SERVICE_GROUP); fi
+
+# Install the build dependencies listed in contrib/debian/control (needs devscripts and equivs).
+deb-build-deps:
+	mkdir -p $(DEB_DIR)
+	cd $(DEB_DIR) && mk-build-deps --install --remove --root-cmd $(SUDO) \
+		--tool 'apt-get -y --no-install-recommends' $(CURDIR)/contrib/debian/control
+
+# Build the Debian package from a copy of the source tree and contrib/debian. Needs network access.
+deb:
+	rm -rf $(DEB_SRC)
+	mkdir -p $(DEB_SRC)
+	git ls-files -z --cached --others --exclude-standard | tar --null -T - -cf - | tar -xf - -C $(DEB_SRC)
+	cp -r contrib/debian $(DEB_SRC)/debian
+	cd $(DEB_SRC) && dpkg-buildpackage -us -uc -b
+	@ls $(DEB_DIR)/*.deb
+
+deb-clean:
+	rm -rf $(DEB_DIR)

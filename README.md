@@ -185,3 +185,21 @@ local overlay. They install the service below `/opt/german-word-splitter`, creat
 dedicated user and group, and install the systemd unit with the `systemd` USE flag, or the OpenRC script
 `contrib/german-word-splitter.initd` without it. The live
 ebuild needs network access during the build (`RESTRICT="network-sandbox"`).
+
+### Debian / Ubuntu package
+
+The Debian source for the package lives in `contrib/debian/` (no binaries are committed).
+It targets Debian stable and the current Ubuntu LTS and needs network access during the build
+(dictionary, PyPI and GitHub).
+
+```sh
+sudo apt install devscripts equivs dpkg-dev
+make deb-build-deps   # installs the build dependencies via mk-build-deps (uses sudo)
+make deb              # writes build/deb/german-word-splitter_<version>_<arch>.deb
+sudo apt install ./build/deb/german-word-splitter_*.deb
+```
+
+The package installs below `/opt/german-word-splitter`, creates the system user and group
+`german-word-splitter` (kept on removal), installs the systemd unit and
+`/etc/default/german-word-splitter`. `make deb-clean` removes `build/deb/`. The package
+version is taken from `contrib/debian/changelog`.

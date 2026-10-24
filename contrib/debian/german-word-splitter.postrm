@@ -1,0 +1,11 @@
+#!/bin/sh
+set -e
+
+# Remove byte-code compiled in postinst; the system user is deliberately kept.
+if [ "$1" = remove ] || [ "$1" = purge ]; then
+	rm -rf /opt/german-word-splitter
+fi
+
+#DEBHELPER#
+
+exit 0
