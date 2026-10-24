@@ -6,6 +6,11 @@ follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+- Limit signed APT repository builds and setup instructions to Debian Trixie
+  and Ubuntu Resolute.
+
 ### Fixed
 
 - Use the current `7zip` package names for Debian, Arch Linux and Gentoo.

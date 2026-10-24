@@ -4,7 +4,7 @@
 # Usage: build-repo.sh INPUT_DIR OUTPUT_DIR
 #
 # INPUT_DIR contains one sub-directory per suite (the distribution codename,
-# e.g. "trixie" or "noble") holding the .deb files built for that suite.
+# e.g. "trixie" or "resolute") holding the .deb files built for that suite.
 # OUTPUT_DIR receives pool/, dists/ and, if signing is enabled, the public key.
 #
 # Signing: set GPG_KEY_ID to the fingerprint of a secret key in the current

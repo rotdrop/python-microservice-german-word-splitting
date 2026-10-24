@@ -213,7 +213,7 @@ The repository is generated; send changes to this repository instead.
 ### Debian / Ubuntu package
 
 The Debian source for the package lives in `contrib/debian/` (no binaries are committed).
-It targets Debian stable and the current Ubuntu LTS and needs network access during the build
+It targets Debian 13 (Trixie) and Ubuntu 26.04 LTS (Resolute) and needs network access during the build
 (dictionary, PyPI and GitHub).
 
 ```sh
@@ -230,14 +230,14 @@ version is taken from `contrib/debian/changelog`.
 
 #### Signed apt repository
 
-Release builds for Debian 13 (suite `trixie`) and Ubuntu 24.04 (`noble`) and 26.04 (`resolute`), each for
+Release builds for Debian 13 (suite `trixie`) and Ubuntu 26.04 (`resolute`), each for
 amd64 and arm64, are published as a signed apt
 repository on GitHub Pages by the `APT repository` workflow (on `v*` tags or manual start).
 The suite is the distribution codename, because the package bundles a virtual environment tied to the
 release's Python. Add the repository with
 
 ```sh
-make install-apt-source          # uses sudo; APT_SUITE=<codename> overrides the detected release
+make install-apt-source          # uses sudo; supports trixie and resolute (or set APT_SUITE explicitly)
 sudo apt update
 sudo apt install german-word-splitter
 ```
