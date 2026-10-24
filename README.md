@@ -206,9 +206,11 @@ version is taken from `contrib/debian/changelog`.
 
 #### Signed apt repository
 
-Release builds for Debian stable and the current Ubuntu LTS (amd64 and arm64) are published as a signed apt
+Release builds for Debian 13 (suite `trixie`) and Ubuntu 24.04 (`noble`) and 26.04 (`resolute`), each for
+amd64 and arm64, are published as a signed apt
 repository on GitHub Pages by the `APT repository` workflow (on `v*` tags or manual start).
-The suite is the distribution codename. Add the repository with
+The suite is the distribution codename, because the package bundles a virtual environment tied to the
+release's Python. Add the repository with
 
 ```sh
 make install-apt-source          # uses sudo; APT_SUITE=<codename> overrides the detected release
