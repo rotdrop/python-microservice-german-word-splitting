@@ -6,6 +6,10 @@ follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+
+- Use the current `7zip` package names for Debian, Arch Linux and Gentoo.
+
 ## [0.2.0] - 2026-10-24
 
 ### Added

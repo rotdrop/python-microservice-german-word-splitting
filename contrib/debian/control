@@ -7,7 +7,7 @@ Build-Depends:
  curl,
  debhelper-compat (= 13),
  git,
- p7zip-full,
+ 7zip,
  python3 (>= 3.13),
  python3-pip,
  python3-venv,

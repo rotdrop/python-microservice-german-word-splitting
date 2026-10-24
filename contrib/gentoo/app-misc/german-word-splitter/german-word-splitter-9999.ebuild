@@ -27,7 +27,7 @@ RDEPEND="
 "
 BDEPEND="
 	${PYTHON_DEPS}
-	app-arch/p7zip
+	app-arch/7zip
 	dev-vcs/git
 	net-misc/curl
 	virtual/libiconv

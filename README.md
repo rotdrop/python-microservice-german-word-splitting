@@ -12,14 +12,14 @@ components. It wraps
 
 ### Prerequisites
 
-`make install` (and `make dictionary`) needs `curl`, `7z` (p7zip) and `iconv`.
+`make install` (and `make dictionary`) needs `curl`, `7z` and `iconv`.
 `iconv` is normally already present. Install the others with your
 distribution's package manager:
 
 **Debian / Ubuntu**
 
 ```sh
-sudo apt install curl p7zip-full
+sudo apt install curl 7zip
 ```
 
 **Fedora / RHEL** (7z is provided by p7zip in EPEL on RHEL)
@@ -31,13 +31,13 @@ sudo dnf install curl p7zip p7zip-plugins
 **Arch Linux**
 
 ```sh
-sudo pacman -S curl p7zip
+sudo pacman -S curl 7zip
 ```
 
 **Gentoo**
 
 ```sh
-sudo emerge --ask net-misc/curl app-arch/p7zip
+sudo emerge --ask net-misc/curl app-arch/7zip
 ```
 
 ### Virtual environment
@@ -103,7 +103,7 @@ The download and extraction happen in `build/`; the converted dictionary is stor
 make dictionary
 ```
 
-This requires `curl`, `7z` (p7zip) and `iconv`, see [Prerequisites](#prerequisites). `make clean` removes `build/` (the downloaded archive and intermediate file) but keeps the virtual environment and the converted dictionary. `make install` records the absolute dictionary path as the default.
+This requires `curl`, `7z` and `iconv`, see [Prerequisites](#prerequisites). `make clean` removes `build/` (the downloaded archive and intermediate file) but keeps the virtual environment and the converted dictionary. `make install` records the absolute dictionary path as the default.
 
 ## Run
 
