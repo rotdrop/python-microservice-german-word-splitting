@@ -6,6 +6,17 @@ follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-10-24
+
+### Added
+
+- Packaging for Debian (`make deb`), RPM, Arch Linux (`make arch`) and Gentoo
+  (`contrib/gentoo` overlay with a live ebuild).
+- Workflows publishing an APT repository and the Gentoo overlay repository.
+- The Gentoo overlay workflow generates an ebuild for the most recent release
+  with keywords `~amd64 ~arm64`.
+- `CONTRIBUTORS.md`, kept up to date by a workflow.
+
 ## [0.1.0] - 2026-10-23
 
 ### Added
