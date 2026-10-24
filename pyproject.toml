@@ -7,7 +7,7 @@ name = "python-microservice-german-word-splitting"
 version = "0.2.0"
 description = "FastAPI microservice for splitting German compound words"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.13"
 dependencies = [
     "compound-split>=1.0.2",
     "fastapi>=0.100,<1.0",

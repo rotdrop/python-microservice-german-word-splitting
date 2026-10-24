@@ -20,10 +20,10 @@ BuildRequires:  curl
 BuildRequires:  git-core
 BuildRequires:  p7zip
 BuildRequires:  p7zip-plugins
-BuildRequires:  python3
+BuildRequires:  python3 >= 3.13
 BuildRequires:  python3-pip
 BuildRequires:  systemd-rpm-macros
-Requires:       python3
+Requires:       python3 >= 3.13
 Requires(pre):  shadow-utils
 %{?systemd_requires}
 

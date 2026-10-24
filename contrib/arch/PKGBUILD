@@ -7,7 +7,7 @@ pkgdesc='FastAPI microservice for splitting German compound words'
 arch=('any')
 url='https://github.com/rotdrop/python-microservice-german-word-splitting'
 license=('AGPL-3.0-or-later')
-depends=('python')
+depends=('python>=3.13')
 makedepends=('ca-certificates' 'curl' 'git' 'python-pip' 'p7zip')
 backup=('etc/default/german-word-splitter')
 options=('!strip' '!debug')

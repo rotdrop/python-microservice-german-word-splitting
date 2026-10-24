@@ -8,7 +8,7 @@ Build-Depends:
  debhelper-compat (= 13),
  git,
  p7zip-full,
- python3 (>= 3.9),
+ python3 (>= 3.13),
  python3-pip,
  python3-venv,
 Standards-Version: 4.6.2
@@ -19,7 +19,7 @@ Package: german-word-splitter
 Architecture: any
 Depends:
  adduser,
- python3 (>= 3.9),
+ python3 (>= 3.13),
  ${misc:Depends},
 Description: FastAPI microservice for splitting German compound words
  A small HTTP service which splits German compound words into their
