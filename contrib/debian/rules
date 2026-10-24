@@ -1,0 +1,33 @@
+#!/usr/bin/make -f
+
+PKG := german-word-splitter
+PREFIX := /opt/$(PKG)
+DEST := $(CURDIR)/debian/$(PKG)
+DICT := german_utf8_linux.dic
+
+%:
+	dh $@
+
+# The top-level Makefile must not be run by debhelper's build system detection.
+override_dh_auto_configure:
+override_dh_auto_test:
+override_dh_auto_clean:
+
+# Needs network access: dictionary download and, in install, PyPI and GitHub.
+override_dh_auto_build:
+	curl -fL -o german.dic.7z "https://sourceforge.net/projects/germandict/files/latest/download"
+	7z x -y german.dic.7z german.dic
+	iconv -f ISO_8859-15 -t UTF-8 german.dic | tr -d '\r' > $(DICT)
+
+override_dh_auto_install:
+	/usr/bin/python3 -m venv $(DEST)$(PREFIX)/venv
+	$(DEST)$(PREFIX)/venv/bin/pip install --no-cache-dir --no-compile .
+	grep -rIl --null -e "$(DEST)" $(DEST)$(PREFIX)/venv/bin $(DEST)$(PREFIX)/venv/pyvenv.cfg \
+		| xargs -0 -r sed -i -e "s|$(DEST)||g"
+	install -D -m 0644 $(DICT) $(DEST)$(PREFIX)/share/$(DICT)
+	install -D -m 0644 contrib/$(PKG).service $(DEST)/lib/systemd/system/$(PKG).service
+	install -D -m 0644 contrib/$(PKG).default $(DEST)/etc/default/$(PKG)
+	sed -i 's|^#\(GERMAN_WORD_SPLITTER_DICTIONARY=\).*|\1$(PREFIX)/share/$(DICT)|' $(DEST)/etc/default/$(PKG)
+
+# The virtual environment contains third-party binaries which must stay untouched.
+override_dh_strip override_dh_dwz override_dh_shlibdeps override_dh_strip_nondeterminism:

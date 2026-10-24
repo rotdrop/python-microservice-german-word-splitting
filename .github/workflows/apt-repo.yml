@@ -1,0 +1,84 @@
+name: APT repository
+
+# Builds the .deb for Debian trixie and Ubuntu noble (24.04) and resolute (26.04) on amd64 and arm64
+# and publishes a signed apt repository on GitHub Pages.
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: apt-repo
+  cancel-in-progress: false
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {suite: trixie, arch: amd64, image: "debian:trixie", runner: ubuntu-latest}
+          - {suite: trixie, arch: arm64, image: "debian:trixie", runner: ubuntu-24.04-arm}
+          - {suite: noble, arch: amd64, image: "ubuntu:24.04", runner: ubuntu-latest}
+          - {suite: noble, arch: arm64, image: "ubuntu:24.04", runner: ubuntu-24.04-arm}
+          - {suite: resolute, arch: amd64, image: "ubuntu:26.04", runner: ubuntu-latest}
+          - {suite: resolute, arch: arm64, image: "ubuntu:26.04", runner: ubuntu-24.04-arm}
+    runs-on: ${{ matrix.runner }}
+    container: ${{ matrix.image }}
+    env:
+      DEBIAN_FRONTEND: noninteractive
+    steps:
+      # git must exist before checkout, otherwise no .git directory is created.
+      - name: Install git
+        run: apt-get update && apt-get install -y --no-install-recommends git ca-certificates
+      - uses: actions/checkout@v5
+      - name: Build the package
+        run: |
+          set -e
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          apt-get install -y --no-install-recommends build-essential devscripts equivs sudo
+          make deb-build-deps
+          make deb
+          . /etc/os-release
+          test "$VERSION_CODENAME" = "${{ matrix.suite }}"
+          mkdir -p "dist/${{ matrix.suite }}"
+          cp build/deb/*.deb "dist/${{ matrix.suite }}/"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: debs-${{ matrix.suite }}-${{ matrix.arch }}
+          path: dist
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+      contents: read
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: debs-*
+          path: dist
+          merge-multiple: true
+      - name: Build the signed repository
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.APT_GPG_PRIVATE_KEY }}
+        run: |
+          set -e
+          printf '%s\n' "$GPG_PRIVATE_KEY" | gpg --batch --import
+          export GPG_KEY_ID=$(gpg --list-secret-keys --with-colons | awk -F: '/^fpr/ {print $10; exit}')
+          contrib/apt/build-repo.sh dist public
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+      - id: deployment
+        uses: actions/deploy-pages@v4

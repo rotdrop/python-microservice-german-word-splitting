@@ -1,0 +1,29 @@
+Source: german-word-splitter
+Section: web
+Priority: optional
+Maintainer: rotdrop <1494769+rotdrop@users.noreply.github.com>
+Build-Depends:
+ ca-certificates,
+ curl,
+ debhelper-compat (= 13),
+ git,
+ p7zip-full,
+ python3 (>= 3.9),
+ python3-pip,
+ python3-venv,
+Standards-Version: 4.6.2
+Homepage: https://github.com/rotdrop/python-microservice-german-word-splitting
+Rules-Requires-Root: no
+
+Package: german-word-splitter
+Architecture: any
+Depends:
+ adduser,
+ python3 (>= 3.9),
+ ${misc:Depends},
+Description: FastAPI microservice for splitting German compound words
+ A small HTTP service which splits German compound words into their
+ components. It is installed below /opt/german-word-splitter together with
+ its own Python virtual environment and the German dictionary, and runs as
+ a systemd service under the dedicated user and group german-word-splitter.
+ Settings are read from /etc/default/german-word-splitter.

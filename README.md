@@ -160,3 +160,132 @@ make test
 | Variable | Default | Description |
 | --- | --- | --- |
 | `GERMAN_WORD_SPLITTER_DICTIONARY` | `$(VENV)/share/german-word-splitter/german_utf8_linux.dic` (set by `make install`) | Dictionary file used by `german_compound_splitter` (created by `make dictionary`). |
+
+## systemd service
+
+`make install-service` (uses `sudo`, override with `SUDO=`) installs the service under
+`/opt/german-word-splitter` (`PREFIX=`), creates the system user and group
+`german-word-splitter`, and installs `contrib/german-word-splitter.service`. Environment
+variables are read from `/etc/default/german-word-splitter`, which is created from
+`contrib/german-word-splitter.default` if missing. Then:
+
+```sh
+sudo systemctl enable --now german-word-splitter
+```
+
+`make uninstall-service` reverts all of this: it stops and disables the service and removes the
+unit, `/opt/german-word-splitter`, `/etc/default/german-word-splitter` (including local edits),
+and the user and group.
+
+### Gentoo
+
+`contrib/gentoo/` contains ebuilds (`acct-group/german-word-splitter`,
+`acct-user/german-word-splitter`, live ebuild `app-misc/german-word-splitter-9999`) for a
+local overlay. They install the service below `/opt/german-word-splitter`, create the
+dedicated user and group, and install the systemd unit with the `systemd` USE flag, or the OpenRC script
+`contrib/german-word-splitter.initd` without it. The live
+ebuild needs network access during the build (`RESTRICT="network-sandbox"`).
+
+### Debian / Ubuntu package
+
+The Debian source for the package lives in `contrib/debian/` (no binaries are committed).
+It targets Debian stable and the current Ubuntu LTS and needs network access during the build
+(dictionary, PyPI and GitHub).
+
+```sh
+sudo apt install devscripts equivs dpkg-dev
+make deb-build-deps   # installs the build dependencies via mk-build-deps (uses sudo)
+make deb              # writes build/deb/german-word-splitter_<version>_<arch>.deb
+sudo apt install ./build/deb/german-word-splitter_*.deb
+```
+
+The package installs below `/opt/german-word-splitter`, creates the system user and group
+`german-word-splitter` (kept on removal), installs the systemd unit and
+`/etc/default/german-word-splitter`. `make deb-clean` removes `build/deb/`. The package
+version is taken from `contrib/debian/changelog`.
+
+#### Signed apt repository
+
+Release builds for Debian 13 (suite `trixie`) and Ubuntu 24.04 (`noble`) and 26.04 (`resolute`), each for
+amd64 and arm64, are published as a signed apt
+repository on GitHub Pages by the `APT repository` workflow (on `v*` tags or manual start).
+The suite is the distribution codename, because the package bundles a virtual environment tied to the
+release's Python. Add the repository with
+
+```sh
+make install-apt-source          # uses sudo; APT_SUITE=<codename> overrides the detected release
+sudo apt update
+sudo apt install german-word-splitter
+```
+
+or by hand:
+
+```sh
+sudo install -d -m 0755 /etc/apt/keyrings
+sudo curl -fsSL -o /etc/apt/keyrings/german-word-splitter.asc \
+  https://rotdrop.github.io/python-microservice-german-word-splitting/german-word-splitter.asc
+sudo tee /etc/apt/sources.list.d/german-word-splitter.sources <<EOF
+Types: deb
+URIs: https://rotdrop.github.io/python-microservice-german-word-splitting
+Suites: $(. /etc/os-release; echo $VERSION_CODENAME)
+Components: main
+Signed-By: /etc/apt/keyrings/german-word-splitter.asc
+EOF
+```
+
+`make uninstall-apt-source` removes both files again. The repository is built by
+`contrib/apt/build-repo.sh` and needs the repository secret `APT_GPG_PRIVATE_KEY` (a passphrase-less
+signing key) and GitHub Pages with the "GitHub Actions" source.
+
+### Fedora / RHEL package
+
+The RPM spec lives in `contrib/rpm/`. Run these on Fedora or RHEL (needs network access during the build):
+
+```sh
+sudo dnf install rpm-build dnf-plugins-core
+make rpm-build-deps   # dnf builddep (uses sudo)
+make rpm              # writes build/rpm/RPMS/<arch>/german-word-splitter-*.rpm
+sudo dnf install build/rpm/RPMS/*/german-word-splitter-*.rpm
+```
+
+On RHEL, `p7zip` and `p7zip-plugins` come from EPEL. The version is taken from `pyproject.toml`
+and must match `Version:` in the spec file. `make rpm-clean` removes `build/rpm/`.
+
+### Arch Linux package
+
+`contrib/arch/PKGBUILD` builds the package with `makepkg` (run as a normal user, needs network access):
+
+```sh
+make arch             # writes build/arch/german-word-splitter-*.pkg.tar.zst
+sudo pacman -U build/arch/german-word-splitter-*.pkg.tar.zst
+```
+
+The system user and group are created via `sysusers.d` (`contrib/german-word-splitter.sysusers`).
+`make arch-clean` removes `build/arch/`.
+
+Both packages install the same layout as the Debian package and keep the version in sync with
+`pyproject.toml` (update `pkgver` and `Version:` on release).
+
+`contrib/gentoo/` is a complete ebuild repository (overlay) named `german-word-splitter`.
+`eselect repository add` can only clone a repository whose root is an overlay, so use a
+local checkout instead:
+
+```sh
+git clone https://github.com/rotdrop/python-microservice-german-word-splitting
+sudo eselect repository create german-word-splitter   # creates /var/db/repos/german-word-splitter
+sudo rm -rf /var/db/repos/german-word-splitter
+sudo ln -s "$PWD/python-microservice-german-word-splitting/contrib/gentoo" /var/db/repos/german-word-splitter
+sudo emerge --ask app-misc/german-word-splitter
+```
+
+Alternatively use the separate repository `rotdrop/german-word-splitter-gentoo-overlay`,
+which the `Gentoo overlay repository` workflow regenerates from `contrib/gentoo`
+whenever `main` changes it (the split is deterministic, so it only ever fast-forwards):
+
+```sh
+sudo eselect repository add german-word-splitter git https://github.com/rotdrop/german-word-splitter-gentoo-overlay
+sudo emerge --sync german-word-splitter
+sudo emerge --ask app-misc/german-word-splitter
+```
+
+The repository is generated; send changes to this repository instead.

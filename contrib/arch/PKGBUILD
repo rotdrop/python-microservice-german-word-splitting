@@ -1,0 +1,42 @@
+# Maintainer: rotdrop <1494769+rotdrop@users.noreply.github.com>
+# Built by `make arch`, which places the source tarball next to this file.
+pkgname=german-word-splitter
+pkgver=0.1.0
+pkgrel=1
+pkgdesc='FastAPI microservice for splitting German compound words'
+arch=('any')
+url='https://github.com/rotdrop/python-microservice-german-word-splitting'
+license=('AGPL-3.0-or-later')
+depends=('python')
+makedepends=('ca-certificates' 'curl' 'git' 'python-pip' 'p7zip')
+backup=('etc/default/german-word-splitter')
+options=('!strip' '!debug')
+source=("$pkgname-$pkgver.tar.gz")
+sha256sums=('SKIP')
+
+_prefix=/opt/german-word-splitter
+_dict=german_utf8_linux.dic
+
+build() {
+  cd "$pkgname-$pkgver"
+  # Needs network access: dictionary download.
+  curl -fL -o german.dic.7z "https://sourceforge.net/projects/germandict/files/latest/download"
+  7z x -y german.dic.7z german.dic
+  iconv -f ISO_8859-15 -t UTF-8 german.dic | tr -d '\r' > "$_dict"
+}
+
+package() {
+  cd "$pkgname-$pkgver"
+  # Needs network access: PyPI and GitHub.
+  /usr/bin/python -m venv "$pkgdir$_prefix/venv"
+  "$pkgdir$_prefix/venv/bin/pip" install --no-cache-dir --no-compile .
+  grep -rIl --null -e "$pkgdir" "$pkgdir$_prefix/venv/bin" "$pkgdir$_prefix/venv/pyvenv.cfg" \
+    | xargs -0 -r sed -i -e "s|$pkgdir||g"
+
+  install -Dm644 "$_dict" "$pkgdir$_prefix/share/$_dict"
+  install -Dm644 contrib/$pkgname.service "$pkgdir/usr/lib/systemd/system/$pkgname.service"
+  install -Dm644 contrib/$pkgname.sysusers "$pkgdir/usr/lib/sysusers.d/$pkgname.conf"
+  install -Dm644 contrib/$pkgname.default "$pkgdir/etc/default/$pkgname"
+  sed -i "s|^#\(GERMAN_WORD_SPLITTER_DICTIONARY=\).*|\1$_prefix/share/$_dict|" "$pkgdir/etc/default/$pkgname"
+  install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+}

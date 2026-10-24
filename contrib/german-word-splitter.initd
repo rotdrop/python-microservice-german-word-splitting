@@ -1,0 +1,25 @@
+#!/sbin/openrc-run
+# OpenRC init script. Settings are read from /etc/default/german-word-splitter.
+
+description="German compound-word splitting microservice"
+
+command="/opt/german-word-splitter/venv/bin/german-word-splitter"
+command_user="german-word-splitter:german-word-splitter"
+command_background=true
+pidfile="/run/${RC_SVCNAME}.pid"
+output_log="/var/log/${RC_SVCNAME}.log"
+error_log="${output_log}"
+
+depend() {
+	need net
+}
+
+start_pre() {
+	checkpath --directory --owner "${command_user}" --mode 0755 /run/german-word-splitter
+	checkpath --file --owner "${command_user}" --mode 0640 "${output_log}"
+	if [ -r /etc/default/german-word-splitter ]; then
+		set -a
+		. /etc/default/german-word-splitter
+		set +a
+	fi
+}
