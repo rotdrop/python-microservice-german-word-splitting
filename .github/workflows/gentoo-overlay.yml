@@ -67,4 +67,4 @@ jobs:
           chmod 600 ~/.ssh/overlay_key
           export GIT_SSH_COMMAND="ssh -i $HOME/.ssh/overlay_key -o StrictHostKeyChecking=accept-new"
           git subtree split --prefix=contrib/gentoo -b gentoo-split
-          git push git@github.com:rotdrop/german-word-splitter-gentoo-overlay.git gentoo-split:refs/heads/main
+          git push --force git@github.com:rotdrop/german-word-splitter-gentoo-overlay.git gentoo-split:refs/heads/main
