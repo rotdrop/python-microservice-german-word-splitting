@@ -176,3 +176,12 @@ sudo systemctl enable --now german-word-splitter
 `make uninstall-service` reverts all of this: it stops and disables the service and removes the
 unit, `/opt/german-word-splitter`, `/etc/default/german-word-splitter` (including local edits),
 and the user and group.
+
+### Gentoo
+
+`contrib/gentoo/` contains ebuilds (`acct-group/german-word-splitter`,
+`acct-user/german-word-splitter`, live ebuild `app-misc/german-word-splitter-9999`) for a
+local overlay. They install the service below `/opt/german-word-splitter`, create the
+dedicated user and group, and install the systemd unit with the `systemd` USE flag, or the OpenRC script
+`contrib/german-word-splitter.initd` without it. The live
+ebuild needs network access during the build (`RESTRICT="network-sandbox"`).
