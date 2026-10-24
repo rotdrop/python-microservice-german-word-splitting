@@ -22,7 +22,7 @@ SYSTEMD_DIR ?= /etc/systemd/system
 DEFAULTS_DIR ?= /etc/default
 VENV_OPTIONS := $(if $(filter 1 true yes,$(SYSTEM_SITE_PACKAGES)),--system-site-packages,)
 
-.PHONY: port socket dictionary-default install venv test dictionary uninstall clean help install-service
+.PHONY: port socket dictionary-default install venv test dictionary uninstall clean help install-service uninstall-service
 
 # Create the virtual environment, install the package with test extras and fetch the dictionary.
 install: venv dictionary dictionary-default port socket
@@ -35,6 +35,7 @@ help:
 		'  test         Run the test suite.' \
 		'  dictionary   Download and convert the German dictionary.' \
 		'  install-service  Install the systemd service under $(PREFIX) (uses sudo; see SUDO, PREFIX).' \
+		'  uninstall-service  Revert install-service: remove unit, $(PREFIX), defaults file, user and group (uses sudo).' \
 		'  uninstall    Remove the virtual environment and dictionary files.' \
 		'  clean        Remove the build/ directory with the download artifacts; keeps the virtual environment.' \
 				'  port         Set the default port with PORT=<port> (for example, make install PORT=9000).' \
@@ -117,3 +118,12 @@ install-service: $(DICT_UTF8)
 		$(SUDO) sed -i 's|^#\(GERMAN_WORD_SPLITTER_DICTIONARY=\).*|\1$(PREFIX)/share/$(notdir $(DICT_UTF8))|' $(DEFAULTS_DIR)/$(SERVICE_NAME); }
 	$(SUDO) systemctl daemon-reload
 	@echo "Installed. Enable with: $(SUDO) systemctl enable --now $(SERVICE_NAME)"
+
+# Revert install-service. Removes $(DEFAULTS_DIR)/$(SERVICE_NAME), including local edits.
+uninstall-service:
+	-$(SUDO) systemctl disable --now $(SERVICE_NAME)
+	$(SUDO) rm -f $(SYSTEMD_DIR)/$(SERVICE_NAME).service $(DEFAULTS_DIR)/$(SERVICE_NAME)
+	$(SUDO) systemctl daemon-reload
+	$(SUDO) rm -rf -- $(PREFIX)
+	if getent passwd $(SERVICE_USER) >/dev/null; then $(SUDO) userdel $(SERVICE_USER); fi
+	if getent group $(SERVICE_GROUP) >/dev/null; then $(SUDO) groupdel $(SERVICE_GROUP); fi

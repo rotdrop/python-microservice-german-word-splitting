@@ -172,3 +172,7 @@ variables are read from `/etc/default/german-word-splitter`, which is created fr
 ```sh
 sudo systemctl enable --now german-word-splitter
 ```
+
+`make uninstall-service` reverts all of this: it stops and disables the service and removes the
+unit, `/opt/german-word-splitter`, `/etc/default/german-word-splitter` (including local edits),
+and the user and group.
