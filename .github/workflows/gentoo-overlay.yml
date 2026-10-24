@@ -1,7 +1,8 @@
-name: Gentoo overlay branch
+name: Gentoo overlay repository
 
-# Publishes contrib/gentoo as the root of the "gentoo" branch so that it can be
-# added with eselect repository add.
+# Publishes contrib/gentoo as the root of the separate repository
+# rotdrop/german-word-splitter-gentoo-overlay so that it can be added with
+# eselect repository add.
 on:
   push:
     branches: [main]
@@ -10,9 +11,6 @@ on:
       - contrib/german-word-splitter.*
       - .github/workflows/gentoo-overlay.yml
   workflow_dispatch:
-
-permissions:
-  contents: write
 
 concurrency:
   group: gentoo-overlay
@@ -25,7 +23,13 @@ jobs:
       - uses: actions/checkout@v5
         with:
           fetch-depth: 0
-      - name: Split contrib/gentoo and push to the gentoo branch
+      - name: Split contrib/gentoo and push to the overlay repository
+        env:
+          DEPLOY_KEY: ${{ secrets.OVERLAY_DEPLOY_KEY }}
         run: |
+          install -m 0700 -d ~/.ssh
+          printf '%s\n' "$DEPLOY_KEY" > ~/.ssh/overlay_key
+          chmod 600 ~/.ssh/overlay_key
+          export GIT_SSH_COMMAND="ssh -i $HOME/.ssh/overlay_key -o StrictHostKeyChecking=accept-new"
           git subtree split --prefix=contrib/gentoo -b gentoo-split
-          git push origin gentoo-split:refs/heads/gentoo
+          git push git@github.com:rotdrop/german-word-splitter-gentoo-overlay.git gentoo-split:refs/heads/main

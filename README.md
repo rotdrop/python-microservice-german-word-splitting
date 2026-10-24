@@ -245,14 +245,14 @@ sudo ln -s "$PWD/python-microservice-german-word-splitting/contrib/gentoo" /var/
 sudo emerge --ask app-misc/german-word-splitter
 ```
 
-Alternatively use the `gentoo` branch, which the `Gentoo overlay branch` workflow
-regenerates from `contrib/gentoo` whenever `main` changes it (the split is
-deterministic, so the branch only ever fast-forwards):
+Alternatively use the separate repository `rotdrop/german-word-splitter-gentoo-overlay`,
+which the `Gentoo overlay repository` workflow regenerates from `contrib/gentoo`
+whenever `main` changes it (the split is deterministic, so it only ever fast-forwards):
 
 ```sh
-sudo eselect repository add german-word-splitter git https://github.com/rotdrop/python-microservice-german-word-splitting
+sudo eselect repository add german-word-splitter git https://github.com/rotdrop/german-word-splitter-gentoo-overlay
+sudo emerge --sync german-word-splitter
+sudo emerge --ask app-misc/german-word-splitter
 ```
 
-`eselect repository` clones the default branch, so add
-`sync-git-clone-extra-opts = --branch gentoo` to the repository's section in
-`/etc/portage/repos.conf/eselect-repo.conf` afterwards.
+The repository is generated; send changes to this repository instead.
