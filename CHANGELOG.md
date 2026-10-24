@@ -6,6 +6,12 @@ follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-10-24
+
+### Added
+
+- Automatic TCP port selection and configurable Unix socket mode.
+
 ## [0.3.0] - 2026-10-24
 
 ### Added

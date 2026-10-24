@@ -1,7 +1,7 @@
 # Maintainer: rotdrop <1494769+rotdrop@users.noreply.github.com>
 # Built by `make arch`, which places the source tarball next to this file.
 pkgname=german-word-splitter
-pkgver=0.3.0
+pkgver=0.4.0
 pkgrel=1
 pkgdesc='FastAPI microservice for splitting German compound words'
 arch=('any')
