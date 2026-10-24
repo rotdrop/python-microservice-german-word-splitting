@@ -186,6 +186,30 @@ dedicated user and group, and install the systemd unit with the `systemd` USE fl
 `contrib/german-word-splitter.initd` without it. The live
 ebuild needs network access during the build (`RESTRICT="network-sandbox"`).
 
+`contrib/gentoo/` is a complete ebuild repository (overlay) named
+`german-word-splitter`. `eselect repository add` can only clone a repository
+whose root is an overlay, so use a local checkout instead:
+
+```sh
+git clone https://github.com/rotdrop/python-microservice-german-word-splitting
+sudo eselect repository create german-word-splitter   # creates /var/db/repos/german-word-splitter
+sudo rm -rf /var/db/repos/german-word-splitter
+sudo ln -s "$PWD/python-microservice-german-word-splitting/contrib/gentoo" /var/db/repos/german-word-splitter
+sudo emerge --ask app-misc/german-word-splitter
+```
+
+Alternatively use the separate repository `rotdrop/german-word-splitter-gentoo-overlay`,
+which the `Gentoo overlay repository` workflow regenerates from `contrib/gentoo`
+whenever `main` changes it (the split is deterministic, so it only ever fast-forwards):
+
+```sh
+sudo eselect repository add german-word-splitter git https://github.com/rotdrop/german-word-splitter-gentoo-overlay
+sudo emerge --sync german-word-splitter
+sudo emerge --ask app-misc/german-word-splitter
+```
+
+The repository is generated; send changes to this repository instead.
+
 ### Debian / Ubuntu package
 
 The Debian source for the package lives in `contrib/debian/` (no binaries are committed).
@@ -265,27 +289,3 @@ The system user and group are created via `sysusers.d` (`contrib/german-word-spl
 
 Both packages install the same layout as the Debian package and keep the version in sync with
 `pyproject.toml` (update `pkgver` and `Version:` on release).
-
-`contrib/gentoo/` is a complete ebuild repository (overlay) named `german-word-splitter`.
-`eselect repository add` can only clone a repository whose root is an overlay, so use a
-local checkout instead:
-
-```sh
-git clone https://github.com/rotdrop/python-microservice-german-word-splitting
-sudo eselect repository create german-word-splitter   # creates /var/db/repos/german-word-splitter
-sudo rm -rf /var/db/repos/german-word-splitter
-sudo ln -s "$PWD/python-microservice-german-word-splitting/contrib/gentoo" /var/db/repos/german-word-splitter
-sudo emerge --ask app-misc/german-word-splitter
-```
-
-Alternatively use the separate repository `rotdrop/german-word-splitter-gentoo-overlay`,
-which the `Gentoo overlay repository` workflow regenerates from `contrib/gentoo`
-whenever `main` changes it (the split is deterministic, so it only ever fast-forwards):
-
-```sh
-sudo eselect repository add german-word-splitter git https://github.com/rotdrop/german-word-splitter-gentoo-overlay
-sudo emerge --sync german-word-splitter
-sudo emerge --ask app-misc/german-word-splitter
-```
-
-The repository is generated; send changes to this repository instead.
