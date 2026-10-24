@@ -1,0 +1,46 @@
+name: Packaging checks
+
+on:
+  push:
+  pull_request:
+    paths:
+      - contrib/**
+      - Makefile
+      - pyproject.toml
+      - .github/workflows/packaging.yml
+
+jobs:
+  syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install tools
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends rpm dpkg-dev debhelper
+      - name: Shell syntax (ebuilds, PKGBUILD, init script, maintainer scripts)
+        run: |
+          set -e
+          for f in contrib/gentoo/*/*/*.ebuild contrib/arch/PKGBUILD; do bash -n "$f"; done
+          sh -n contrib/german-word-splitter.initd contrib/debian/*.postinst contrib/debian/*.postrm
+      - name: Debian source package
+        run: |
+          set -e
+          dpkg-parsechangelog -l contrib/debian/changelog
+          make -n -f contrib/debian/rules build > /dev/null
+          test "$(cat contrib/debian/source/format)" = "3.0 (native)"
+      - name: RPM spec
+        run: rpmspec -P contrib/rpm/german-word-splitter.spec > /dev/null
+      - name: systemd unit
+        run: |
+          # The binary is not installed on the runner, so ignore that message only.
+          out=$(systemd-analyze verify --man=no contrib/german-word-splitter.service 2>&1 | grep -v "is not executable" || true)
+          echo "$out"
+          test -z "$out"
+      - name: Package versions agree with pyproject.toml
+        run: |
+          set -e
+          v=$(sed -n 's/^version = "\(.*\)"/\1/p' pyproject.toml)
+          grep -q "^Version:[[:space:]]*$v\$" contrib/rpm/german-word-splitter.spec
+          grep -q "^pkgver=$v\$" contrib/arch/PKGBUILD
+          head -1 contrib/debian/changelog | grep -q "($v)"
+      - name: Makefile targets parse
+        run: make -n install-service uninstall-service deb rpm arch SUDO=

@@ -245,8 +245,14 @@ sudo ln -s "$PWD/python-microservice-german-word-splitting/contrib/gentoo" /var/
 sudo emerge --ask app-misc/german-word-splitter
 ```
 
-Alternatively publish the directory as its own branch with
-`git subtree split --prefix=contrib/gentoo -b gentoo` and add that branch with
-`eselect repository add german-word-splitter git <url>`, which only works if the branch
-is used as the repository's default branch (or via `sync-git-clone-extra-opts = --branch gentoo`
-in `repos.conf`).
+Alternatively use the `gentoo` branch, which the `Gentoo overlay branch` workflow
+regenerates from `contrib/gentoo` whenever `main` changes it (the split is
+deterministic, so the branch only ever fast-forwards):
+
+```sh
+sudo eselect repository add german-word-splitter git https://github.com/rotdrop/python-microservice-german-word-splitting
+```
+
+`eselect repository` clones the default branch, so add
+`sync-git-clone-extra-opts = --branch gentoo` to the repository's section in
+`/etc/portage/repos.conf/eselect-repo.conf` afterwards.

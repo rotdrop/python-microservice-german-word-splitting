@@ -1,0 +1,31 @@
+name: Gentoo overlay branch
+
+# Publishes contrib/gentoo as the root of the "gentoo" branch so that it can be
+# added with eselect repository add.
+on:
+  push:
+    branches: [main]
+    paths:
+      - contrib/gentoo/**
+      - contrib/german-word-splitter.*
+      - .github/workflows/gentoo-overlay.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: gentoo-overlay
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Split contrib/gentoo and push to the gentoo branch
+        run: |
+          git subtree split --prefix=contrib/gentoo -b gentoo-split
+          git push origin gentoo-split:refs/heads/gentoo
