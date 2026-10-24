@@ -19,7 +19,7 @@ jobs:
       - name: Shell syntax (ebuilds, PKGBUILD, init script, maintainer scripts)
         run: |
           set -e
-          for f in contrib/gentoo/*/*/*.ebuild contrib/arch/PKGBUILD; do bash -n "$f"; done
+          for f in contrib/gentoo/*/*/*.ebuild contrib/arch/PKGBUILD contrib/apt/build-repo.sh; do bash -n "$f"; done
           sh -n contrib/german-word-splitter.initd contrib/debian/*.postinst contrib/debian/*.postrm
       - name: Debian source package
         run: |
@@ -43,4 +43,4 @@ jobs:
           grep -q "^pkgver=$v\$" contrib/arch/PKGBUILD
           head -1 contrib/debian/changelog | grep -q "($v)"
       - name: Makefile targets parse
-        run: make -n install-service uninstall-service deb rpm arch SUDO=
+        run: make -n install-service uninstall-service install-apt-source uninstall-apt-source deb rpm arch SUDO=
