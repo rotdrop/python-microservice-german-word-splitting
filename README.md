@@ -160,3 +160,15 @@ make test
 | Variable | Default | Description |
 | --- | --- | --- |
 | `GERMAN_WORD_SPLITTER_DICTIONARY` | `$(VENV)/share/german-word-splitter/german_utf8_linux.dic` (set by `make install`) | Dictionary file used by `german_compound_splitter` (created by `make dictionary`). |
+
+## systemd service
+
+`make install-service` (uses `sudo`, override with `SUDO=`) installs the service under
+`/opt/german-word-splitter` (`PREFIX=`), creates the system user and group
+`german-word-splitter`, and installs `contrib/german-word-splitter.service`. Environment
+variables are read from `/etc/default/german-word-splitter`, which is created from
+`contrib/german-word-splitter.default` if missing. Then:
+
+```sh
+sudo systemctl enable --now german-word-splitter
+```

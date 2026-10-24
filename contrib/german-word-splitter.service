@@ -1,0 +1,22 @@
+[Unit]
+Description=German compound-word splitting microservice
+After=network.target
+
+[Service]
+Type=simple
+# `make install-service` sets User, Group and ExecStart; create the account manually otherwise.
+# Optional variables: GERMAN_WORD_SPLITTER_PORT, GERMAN_WORD_SPLITTER_SOCKET,
+# GERMAN_WORD_SPLITTER_DICTIONARY
+EnvironmentFile=-/etc/default/german-word-splitter
+ExecStart=/opt/german-word-splitter/venv/bin/german-word-splitter
+User=german-word-splitter
+Group=german-word-splitter
+RuntimeDirectory=german-word-splitter
+Restart=on-failure
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+
+[Install]
+WantedBy=multi-user.target
