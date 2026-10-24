@@ -25,9 +25,10 @@ DEB_VERSION = $(shell sed -n '1s/^[^(]*(\([^)]*\)).*/\1/p' contrib/debian/change
 DEB_SRC = $(DEB_DIR)/$(SERVICE_NAME)-$(DEB_VERSION)
 PKG_VERSION := $(shell sed -n 's/^version = "\(.*\)"/\1/p' pyproject.toml)
 RPM_DIR := $(BUILD_DIR)/rpm
+ARCH_DIR := $(BUILD_DIR)/arch
 VENV_OPTIONS := $(if $(filter 1 true yes,$(SYSTEM_SITE_PACKAGES)),--system-site-packages,)
 
-.PHONY: port socket dictionary-default install venv test dictionary uninstall clean help install-service uninstall-service deb-build-deps deb deb-clean rpm-build-deps rpm rpm-clean
+.PHONY: port socket dictionary-default install venv test dictionary uninstall clean help install-service uninstall-service deb-build-deps deb deb-clean rpm-build-deps rpm rpm-clean arch arch-clean
 
 # Create the virtual environment, install the package with test extras and fetch the dictionary.
 install: venv dictionary dictionary-default port socket
@@ -47,6 +48,8 @@ help:
 		'  rpm-build-deps   Install the RPM build dependencies with dnf (Fedora/RHEL, uses sudo).' \
 		'  rpm              Build the RPM from contrib/rpm into $(RPM_DIR)/.' \
 		'  rpm-clean        Remove $(RPM_DIR)/.' \
+		'  arch             Build the Arch Linux package from contrib/arch into $(ARCH_DIR)/ (makepkg).' \
+		'  arch-clean       Remove $(ARCH_DIR)/.' \
 		'  uninstall    Remove the virtual environment and dictionary files.' \
 		'  clean        Remove the build/ directory with the download artifacts; keeps the virtual environment.' \
 				'  port         Set the default port with PORT=<port> (for example, make install PORT=9000).' \
@@ -157,7 +160,7 @@ deb:
 deb-clean:
 	rm -rf $(DEB_DIR)
 
-# Source tarball of the tracked and unignored files, as expected by the RPM package.
+# Source tarball of the tracked and unignored files, as expected by the RPM and Arch packages.
 define source_tarball
 mkdir -p $(dir $(1))
 git ls-files -z --cached --others --exclude-standard | tar --null -T - --transform 's|^|$(SERVICE_NAME)-$(PKG_VERSION)/|' -czf $(1)
@@ -176,3 +179,14 @@ rpm:
 
 rpm-clean:
 	rm -rf $(RPM_DIR)
+
+# Build the Arch Linux package from contrib/arch/PKGBUILD. Needs network access; run as a normal user.
+arch:
+	rm -rf $(ARCH_DIR)
+	$(call source_tarball,$(ARCH_DIR)/$(SERVICE_NAME)-$(PKG_VERSION).tar.gz)
+	cp contrib/arch/PKGBUILD $(ARCH_DIR)/
+	cd $(ARCH_DIR) && makepkg -sf
+	@ls $(ARCH_DIR)/*.pkg.tar.*
+
+arch-clean:
+	rm -rf $(ARCH_DIR)

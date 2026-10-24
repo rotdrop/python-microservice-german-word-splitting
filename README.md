@@ -217,3 +217,18 @@ sudo dnf install build/rpm/RPMS/*/german-word-splitter-*.rpm
 
 On RHEL, `p7zip` and `p7zip-plugins` come from EPEL. The version is taken from `pyproject.toml`
 and must match `Version:` in the spec file. `make rpm-clean` removes `build/rpm/`.
+
+### Arch Linux package
+
+`contrib/arch/PKGBUILD` builds the package with `makepkg` (run as a normal user, needs network access):
+
+```sh
+make arch             # writes build/arch/german-word-splitter-*.pkg.tar.zst
+sudo pacman -U build/arch/german-word-splitter-*.pkg.tar.zst
+```
+
+The system user and group are created via `sysusers.d` (`contrib/german-word-splitter.sysusers`).
+`make arch-clean` removes `build/arch/`.
+
+Both packages install the same layout as the Debian package and keep the version in sync with
+`pyproject.toml` (update `pkgver` and `Version:` on release).
