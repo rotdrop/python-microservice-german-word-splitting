@@ -6,8 +6,17 @@ follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-10-24
+
+### Added
+
+- The APT repository and Gentoo overlay retain packages for the three most
+  recent releases.
+
 ### Changed
 
+- Align the minimum supported Python version and package metadata with the
+  Python 3.13+ test matrix.
 - Limit signed APT repository builds and setup instructions to Debian Trixie
   and Ubuntu Resolute.
 
