@@ -96,7 +96,19 @@ def proxy_without_upstream(tmp_path):
 
 @pytest.fixture
 def proxy_with_launchable_service(tmp_path):
-    service_port = _free_port()
+    yield from _launchable_service(tmp_path, _free_port())
+
+
+@pytest.fixture
+def proxy_with_auto_port_service(tmp_path):
+    port_file = tmp_path / "service.port"
+    port_file.write_text(f"{_free_port()}\n")  # stale file from a dead instance
+    yield from _launchable_service(
+        tmp_path, 0, {"GERMAN_WORD_SPLITTER_PORT_FILE": str(port_file)}
+    )
+
+
+def _launchable_service(tmp_path, service_port, extra_env=None):
     executable = tmp_path / "fake-service"
     executable.write_text(
         f"""#!{sys.executable}
@@ -119,14 +131,18 @@ class Handler(BaseHTTPRequestHandler):
 server = ThreadingHTTPServer(
     ("127.0.0.1", int(os.environ["GERMAN_WORD_SPLITTER_PORT"])), Handler
 )
+port_file = os.environ.get("GERMAN_WORD_SPLITTER_PORT_FILE")
+if port_file and os.environ["GERMAN_WORD_SPLITTER_PORT"] == "0":
+    with open(port_file, "w") as fh:
+        print(server.server_port, file=fh)
 server.serve_forever()
 """
     )
     executable.chmod(0o755)
-    yield from _start_proxy(tmp_path, service_port, executable)
+    yield from _start_proxy(tmp_path, service_port, executable, extra_env)
 
 
-def _start_proxy(tmp_path, service_port, executable=None):
+def _start_proxy(tmp_path, service_port, executable=None, extra_env=None):
     php = shutil.which("php")
     server_port = _free_port()
     env = os.environ.copy()
@@ -140,6 +156,7 @@ def _start_proxy(tmp_path, service_port, executable=None):
             "GERMAN_WORD_SPLITTER_SOCKET": "",
         }
     )
+    env.update(extra_env or {})
     command = [php, "-S", f"127.0.0.1:{server_port}", "-t", str(PROXY.parent)]
     if env.get("PHP_PROXY_COVERAGE_DIR"):
         command[1:1] = ["-d", f"auto_prepend_file={COVERAGE_PREPEND}"]
@@ -232,3 +249,27 @@ def test_launches_service_when_upstream_is_unavailable(proxy_with_launchable_ser
 
     assert status == 200
     assert body == b"started service"
+
+
+def test_launches_service_on_auto_selected_port(proxy_with_auto_port_service):
+    status, _, body = _request(
+        proxy_with_auto_port_service, "/proxy.php?path=%2Fhealth"
+    )
+
+    assert status == 200
+    assert body == b"started service"
+
+
+def test_uses_port_from_port_file_when_port_is_zero(tmp_path, upstream):
+    port_file = tmp_path / "running.port"
+    port_file.write_text(f"{upstream}\n")
+    server = _start_proxy(
+        tmp_path, 0, None, {"GERMAN_WORD_SPLITTER_PORT_FILE": str(port_file)}
+    )
+    port = next(server)
+
+    status, _, body = _request(port, "/proxy.php/split")
+
+    assert status == 202
+    assert body == b"upstream response"
+    server.close()

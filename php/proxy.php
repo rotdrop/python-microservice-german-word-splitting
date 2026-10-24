@@ -20,7 +20,8 @@
  */
 
 $bin    = getenv('GERMAN_WORD_SPLITTER_BIN') ?: __DIR__ . '/../venv/bin/german-word-splitter';
-$port   = (int)(getenv('GERMAN_WORD_SPLITTER_PORT') ?: 8000);
+$port   = (int)(getenv('GERMAN_WORD_SPLITTER_PORT') !== false
+    && getenv('GERMAN_WORD_SPLITTER_PORT') !== '' ? getenv('GERMAN_WORD_SPLITTER_PORT') : 8000);
 $socket = getenv('GERMAN_WORD_SPLITTER_SOCKET') ?: '';
 $portFile = getenv('GERMAN_WORD_SPLITTER_PORT_FILE')
     ?: sys_get_temp_dir() . '/german-word-splitter-' . md5($bin) . '.port';
