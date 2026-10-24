@@ -1,6 +1,6 @@
 name: APT repository
 
-# Builds the .deb for Debian trixie and Ubuntu noble (24.04) and resolute (26.04) on amd64 and arm64
+# Builds the .deb for Debian trixie and Ubuntu resolute (26.04) on amd64 and arm64
 # and publishes a signed apt repository on GitHub Pages, keeping the three most recent releases.
 on:
   push:
@@ -22,8 +22,6 @@ jobs:
         include:
           - {suite: trixie, arch: amd64, image: "debian:trixie", runner: ubuntu-latest}
           - {suite: trixie, arch: arm64, image: "debian:trixie", runner: ubuntu-24.04-arm}
-          - {suite: noble, arch: amd64, image: "ubuntu:24.04", runner: ubuntu-latest}
-          - {suite: noble, arch: arm64, image: "ubuntu:24.04", runner: ubuntu-24.04-arm}
           - {suite: resolute, arch: amd64, image: "ubuntu:26.04", runner: ubuntu-latest}
           - {suite: resolute, arch: arm64, image: "ubuntu:26.04", runner: ubuntu-24.04-arm}
     runs-on: ${{ matrix.runner }}

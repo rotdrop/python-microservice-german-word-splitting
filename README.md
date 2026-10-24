@@ -12,14 +12,14 @@ components. It wraps
 
 ### Prerequisites
 
-`make install` (and `make dictionary`) needs `curl`, `7z` (p7zip) and `iconv`.
+`make install` (and `make dictionary`) needs `curl`, `7z` and `iconv`.
 `iconv` is normally already present. Install the others with your
 distribution's package manager:
 
 **Debian / Ubuntu**
 
 ```sh
-sudo apt install curl p7zip-full
+sudo apt install curl 7zip
 ```
 
 **Fedora / RHEL** (7z is provided by p7zip in EPEL on RHEL)
@@ -31,13 +31,13 @@ sudo dnf install curl p7zip p7zip-plugins
 **Arch Linux**
 
 ```sh
-sudo pacman -S curl p7zip
+sudo pacman -S curl 7zip
 ```
 
 **Gentoo**
 
 ```sh
-sudo emerge --ask net-misc/curl app-arch/p7zip
+sudo emerge --ask net-misc/curl app-arch/7zip
 ```
 
 ### Virtual environment
@@ -103,7 +103,7 @@ The download and extraction happen in `build/`; the converted dictionary is stor
 make dictionary
 ```
 
-This requires `curl`, `7z` (p7zip) and `iconv`, see [Prerequisites](#prerequisites). `make clean` removes `build/` (the downloaded archive and intermediate file) but keeps the virtual environment and the converted dictionary. `make install` records the absolute dictionary path as the default.
+This requires `curl`, `7z` and `iconv`, see [Prerequisites](#prerequisites). `make clean` removes `build/` (the downloaded archive and intermediate file) but keeps the virtual environment and the converted dictionary. `make install` records the absolute dictionary path as the default.
 
 ## Run
 
@@ -213,7 +213,7 @@ The repository is generated; send changes to this repository instead.
 ### Debian / Ubuntu package
 
 The Debian source for the package lives in `contrib/debian/` (no binaries are committed).
-It targets Debian stable and the current Ubuntu LTS and needs network access during the build
+It targets Debian 13 (Trixie) and Ubuntu 26.04 LTS (Resolute) and needs network access during the build
 (dictionary, PyPI and GitHub).
 
 ```sh
@@ -230,14 +230,14 @@ version is taken from `contrib/debian/changelog`.
 
 #### Signed apt repository
 
-Release builds for Debian 13 (suite `trixie`) and Ubuntu 24.04 (`noble`) and 26.04 (`resolute`), each for
+Release builds for Debian 13 (suite `trixie`) and Ubuntu 26.04 (`resolute`), each for
 amd64 and arm64, are published as a signed apt
 repository on GitHub Pages by the `APT repository` workflow (on `v*` tags or manual start).
 The suite is the distribution codename, because the package bundles a virtual environment tied to the
 release's Python. Add the repository with
 
 ```sh
-make install-apt-source          # uses sudo; APT_SUITE=<codename> overrides the detected release
+make install-apt-source          # uses sudo; supports trixie and resolute (or set APT_SUITE explicitly)
 sudo apt update
 sudo apt install german-word-splitter
 ```
