@@ -21,6 +21,7 @@ fi
 in_dir=$(realpath "$1")
 out_dir=$(mkdir -p "$2" && realpath "$2")
 component=main
+keep_releases=${KEEP_RELEASES:-3}
 origin=german-word-splitter
 
 for suite_dir in "$in_dir"/*/; do
@@ -28,6 +29,14 @@ for suite_dir in "$in_dir"/*/; do
 	pool="pool/$suite/$component"
 	mkdir -p "$out_dir/$pool"
 	cp "$suite_dir"/*.deb "$out_dir/$pool/"
+
+	# Keep only the newest $keep_releases versions per package and architecture.
+	for deb in "$out_dir/$pool"/*.deb; do
+		printf '%s %s %s %s\n' "$(dpkg-deb -f "$deb" Package)" "$(dpkg-deb -f "$deb" Architecture)" \
+			"$(dpkg-deb -f "$deb" Version)" "$deb"
+	done | sort -k1,2 -k3,3Vr | awk -v keep="$keep_releases" '
+		{ key = $1 " " $2; if (key != last) { n = 0; last = key } if (++n > keep) print $4 }' \
+		| xargs -r rm -f --
 
 	archs=()
 	for deb in "$out_dir/$pool"/*.deb; do
