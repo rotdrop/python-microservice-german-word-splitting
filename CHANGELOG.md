@@ -4,6 +4,13 @@ All notable changes to this project are documented in this file. Entries follow
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and released versions
 follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.1] - 2026-10-25
+
+### Fixed
+
+- Install the Gentoo defaults file with the documented configuration options
+  and the installed dictionary path.
+
 ## [0.4.0] - 2026-10-24
 
 ### Added
