@@ -1,9 +1,19 @@
 # Install as /etc/default/german-word-splitter
+# All settings are optional; uncomment a line to override its default.
+
+# TCP port to listen on at 127.0.0.1 (default 8000). Port 0 lets the kernel
+# choose a free port; it is written to the port file below.
 #GERMAN_WORD_SPLITTER_PORT=8000
-# Port 0 lets the kernel choose a free port; read it from the port file.
+
+# File to which the effective TCP port is written (useful with port 0).
 #GERMAN_WORD_SPLITTER_PORT_FILE=/run/german-word-splitter/port
+
+# Unix domain socket to listen on instead of a TCP port.
 #GERMAN_WORD_SPLITTER_SOCKET=/run/german-word-splitter/german-word-splitter.sock
+
 # Permission bits (octal) of the socket. Default 660: add clients to the
 # german-word-splitter group, or use 666 to allow every local user.
 #GERMAN_WORD_SPLITTER_SOCKET_MODE=660
+
+# Dictionary file used by german_compound_splitter.
 #GERMAN_WORD_SPLITTER_DICTIONARY=/opt/german-word-splitter/venv/share/german-word-splitter/german_utf8_linux.dic
