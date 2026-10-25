@@ -57,10 +57,13 @@ src_install() {
 	doins "${DICT_NAME}"
 
 	newins contrib/${PN}.default ${PN}.default
+
+	# Same as the other packages: only the dictionary path is set, to the
+	# installed dictionary; all other options stay commented out.
+	sed -e "s|^#\(GERMAN_WORD_SPLITTER_DICTIONARY=\).*|\1${MY_PREFIX}/share/${DICT_NAME}|" \
+		contrib/${PN}.default > "${T}/${PN}.etc" || die
 	insinto /etc/default
-	newins - ${PN} <<-EOF
-		GERMAN_WORD_SPLITTER_DICTIONARY=${MY_PREFIX}/share/${DICT_NAME}
-	EOF
+	newins "${T}/${PN}.etc" ${PN}
 
 	if use systemd; then
 		systemd_dounit contrib/${PN}.service
