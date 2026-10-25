@@ -1,0 +1,38 @@
+name: Release
+
+# Creates a GitHub release for tags vX.Y.Z and a pre-release for tags vX.Y.Z-rcW.
+# Any other tag is ignored.
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+      - 'v[0-9]+.[0-9]+.[0-9]+-rc[0-9]+'
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          set -e
+          # The glob filters above are looser than a regex, so validate strictly.
+          if [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            flags="--latest"
+          elif [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+-rc[0-9]+$ ]]; then
+            flags="--prerelease"
+          else
+            echo "Tag $TAG is not a release tag, nothing to do."
+            exit 0
+          fi
+          gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --verify-tag \
+            --title "$TAG" --generate-notes $flags
+          # Events caused by GITHUB_TOKEN do not trigger other workflows,
+          # so start the overlay publication explicitly.
+          gh workflow run gentoo-overlay.yml --repo "$GITHUB_REPOSITORY" --ref main
