@@ -161,11 +161,12 @@ be configured in `GERMAN_WORD_SPLITTER_TRANSLITERATION_LOCALES` (language part c
 transliteration changes the result, otherwise HTTP 400 is returned. This check
 is skipped for `charsplit`.
 
-The word must be given in its original German spelling, not transliterated
-(`einkäufe`, not `einkaeufe`). The dictionaries only contain the original
-spelling with `ä`, `ö`, `ü` and `ß`, and a transliteration cannot be reliably
-reverted without a dictionary. Transliterated words are usually reported as not
-splittable.
+For `german_compound_splitter`, transliterated input is supported when its
+transliteration locale is configured in
+`GERMAN_WORD_SPLITTER_TRANSLITERATION_LOCALES`. The splitter detects which
+configured locale best matches the input and returns components transliterated
+the same way; original German input continues to return components in their
+original spelling. `charsplit` does not use this dictionary-based behavior.
 
 ## Tests
 
@@ -178,7 +179,7 @@ make test
 | Variable | Default | Description |
 | --- | --- | --- |
 | `GERMAN_WORD_SPLITTER_DICTIONARY` | `$(VENV)/share/german-word-splitter/german_utf8_linux.dic` (set by `make install`) | Dictionary file used by `german_compound_splitter` (created by `make dictionary`). |
-| `GERMAN_WORD_SPLITTER_TRANSLITERATION_LOCALES` | empty (no transliteration) | Comma- or whitespace-separated locales, e.g. `de_DE.UTF-8,en_US.UTF-8`, read at dictionary load time. Transliterated spellings of dictionary words then also match, so e.g. *Einkaeufe* (`de`: ä→ae, ö→oe, ü→ue) and *Einkaufe* (other locales such as `en_US`: ä→a, ö→o, ü→u) are split like *Einkäufe*; ß→ss in all locales. Only the language part is evaluated. Returned components keep the original dictionary spelling. The locales must be installed on the system, otherwise the service refuses to start. |
+| `GERMAN_WORD_SPLITTER_TRANSLITERATION_LOCALES` | empty (no transliteration) | Comma- or whitespace-separated locales, e.g. `de_DE.UTF-8,en_US.UTF-8`, read at dictionary load time. Transliterated spellings of dictionary words then also match, so e.g. *Einkaeufe* (`de`: ä→ae, ö→oe, ü→ue) and *Einkaufe* (other locales such as `en_US`: ä→a, ö→o, ü→u) are split like *Einkäufe*. ß→ss in all locales. Only the language part is evaluated. Components of original German input keep the original dictionary spelling; components of transliterated input use the best-matching configured locale's transliteration. The locales must be installed on the system, otherwise the service refuses to start. |
 
 ## systemd service
 
