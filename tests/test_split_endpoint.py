@@ -62,3 +62,23 @@ def test_real_german_compound_splitter_contract(real_gcs_client):
     assert set(body) == {"word", "splittable", "components"}
     assert body["word"] == "Haustür"
     assert isinstance(body["components"], list)
+
+
+def test_transliterate_option(client):
+    r = client.post("/split", json={"word": "Haustür", "transliterate": "C.UTF-8"})
+    assert r.status_code == 200
+    assert r.json()["components"] == ["Haus", "Tur"]
+
+
+def test_transliterate_unconfigured_locale_is_rejected(client):
+    r = client.post(
+        "/split",
+        json={"word": "Haustür", "method": "german_compound_splitter", "transliterate": "C.UTF-8"},
+    )
+    assert r.status_code == 400
+    assert "TRANSLITERATION_LOCALES" in r.json()["detail"]
+
+
+def test_split_failure_is_logged_and_rejected(client, service):
+    service._factories["charsplit"] = lambda s: (_ for _ in ()).throw(RuntimeError("boom"))
+    assert client.post("/split", json={"word": "Haustür"}).status_code == 400

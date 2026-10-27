@@ -92,3 +92,32 @@ def test_iconv_transliteration():
     from german_word_splitter.transliteration import transliterate
 
     assert transliterate("Käse Straße", "C.UTF-8") == "Kase Strasse"
+
+
+def test_iconv_failure_is_reported(monkeypatch):
+    import subprocess
+
+    from german_word_splitter import transliteration
+    from german_word_splitter.errors import TransliterationError
+
+    def boom(*args, **kwargs):
+        raise subprocess.CalledProcessError(1, "iconv")
+
+    monkeypatch.setattr(transliteration.subprocess, "run", boom)
+    with pytest.raises(TransliterationError):
+        transliteration.transliterate("Käse", "C.UTF-8")
+
+
+def test_unavailable_locale_is_reported():
+    from german_word_splitter.errors import TransliterationError
+    from german_word_splitter.transliteration import transliterate
+
+    with pytest.raises(TransliterationError):
+        transliterate("Käse", "xx_YY.UTF-8")
+
+
+def test_get_service_is_cached(monkeypatch):
+    from german_word_splitter.services import splitter_service
+
+    monkeypatch.setattr(splitter_service, "_service", None)
+    assert splitter_service.get_service() is splitter_service.get_service()
