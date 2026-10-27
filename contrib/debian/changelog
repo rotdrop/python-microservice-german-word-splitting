@@ -1,3 +1,9 @@
+german-word-splitter (0.5.0) unstable; urgency=medium
+
+  * New upstream release 0.5.0.
+
+ -- rotdrop <1494769+rotdrop@users.noreply.github.com>  Tue, 27 Oct 2026 18:04:19 +0000
+
 german-word-splitter (0.4.1) unstable; urgency=medium
 
   * New upstream release 0.4.1.
