@@ -1,10 +1,11 @@
 """Locale dependent transliteration through iconv."""
 
+import locale as _locale
 import re
 import subprocess
 from typing import Sequence
 
-from .errors import TransliterationError
+from .errors import LocaleNotInstalledError, TransliterationError
 
 
 def language(locale: str) -> str:
@@ -46,3 +47,25 @@ def transliterate(text: str, locale: str) -> str:
             f"Locale {locale} is not available for transliteration of {text}."
         )
     return result
+
+
+def check_locales_installed(locales: Sequence[str]) -> None:
+    """Raise LocaleNotInstalledError unless all locales are installed on the system.
+
+    Meant to be called at startup: setlocale() is process wide and not thread safe.
+    """
+    saved = _locale.setlocale(_locale.LC_CTYPE)
+    missing = []
+    try:
+        for name in locales:
+            try:
+                _locale.setlocale(_locale.LC_CTYPE, _locale_name(name))
+            except _locale.Error:
+                missing.append(name)
+    finally:
+        _locale.setlocale(_locale.LC_CTYPE, saved)
+    if missing:
+        raise LocaleNotInstalledError(
+            "Locales configured in GERMAN_WORD_SPLITTER_TRANSLITERATION_LOCALES "
+            f"are not installed: {', '.join(missing)}"
+        )

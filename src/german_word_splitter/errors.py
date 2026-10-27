@@ -19,3 +19,7 @@ class SplitFailedError(SplitterError):
 
 class TransliterationError(SplitterError):
     """The result cannot reliably be transliterated for the requested locale."""
+
+
+class LocaleNotInstalledError(Exception):
+    """A configured transliteration locale is not installed on the system."""
