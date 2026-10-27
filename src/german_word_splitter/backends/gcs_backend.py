@@ -11,5 +11,11 @@ class GcsBackend:
         self._ahocs = comp_split.read_dictionary_from_file(dictionary_path)
 
     def split(self, word: str) -> List[str]:
-        dissection = self._comp_split.dissect(word, self._ahocs, make_singular=False)
+        try:
+            dissection = self._comp_split.dissect(
+                word, self._ahocs, make_singular=False
+            )
+        except IndexError:
+            # german_compound_splitter indexes an empty result for unsplittable words.
+            return [word]
         return self._comp_split.merge_fractions(dissection)

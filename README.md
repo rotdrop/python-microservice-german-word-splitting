@@ -153,6 +153,12 @@ curl -X POST http://127.0.0.1:8000/split \
 
 An empty word or unknown method yields HTTP 400.
 
+The word must be given in its original German spelling, not transliterated
+(`einkäufe`, not `einkaeufe`). The dictionaries only contain the original
+spelling with `ä`, `ö`, `ü` and `ß`, and a transliteration cannot be reliably
+reverted without a dictionary. Transliterated words are usually reported as not
+splittable.
+
 ## Tests
 
 ```sh
