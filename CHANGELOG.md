@@ -6,6 +6,13 @@ follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-10-27
+
+### Added
+
+- Optional `transliterate` locale for transliterating split components in the
+  `/split` endpoint.
+
 ## [0.5.0] - 2026-10-27
 
 ### Added
