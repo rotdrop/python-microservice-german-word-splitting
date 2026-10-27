@@ -46,8 +46,13 @@ def real_gcs_client(tmp_path):
     from german_word_splitter.services.splitter_service import SplitterService
 
     dictionary = tmp_path / "test.dic"
-    dictionary.write_text("Haus\nTür\nTuer\n", encoding="utf-8")
-    service = SplitterService(settings=Settings(dictionary_path=str(dictionary)))
+    dictionary.write_text("Haus\nTür\n", encoding="utf-8")
+    service = SplitterService(
+        settings=Settings(
+            dictionary_path=str(dictionary),
+            transliteration_locales=("de_DE.UTF-8",),
+        )
+    )
     app = create_app()
     app.dependency_overrides[get_service] = lambda: service
     return TestClient(app)
@@ -62,6 +67,14 @@ def test_real_german_compound_splitter_contract(real_gcs_client):
     assert set(body) == {"word", "splittable", "components"}
     assert body["word"] == "Haustür"
     assert isinstance(body["components"], list)
+
+
+def test_real_german_compound_splitter_preserves_transliterated_input(real_gcs_client):
+    r = real_gcs_client.post(
+        "/split", json={"word": "Haustuer", "method": "german_compound_splitter"}
+    )
+    assert r.status_code == 200
+    assert r.json()["components"] == ["Haus", "Tuer"]
 
 
 def test_transliterate_option(client):

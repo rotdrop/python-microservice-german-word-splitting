@@ -53,9 +53,12 @@ def test_original_spelling_with_any_locales(dictionary, locales, word, expected)
 @pytest.mark.parametrize(
     "word, expected",
     [
-        ("Einkaeufe", EINKAUFE),
-        (DONAU_DE, DONAU),
-        ("Strassenfahrt", STRASSEN),
+        ("Einkaeufe", ["Einkaeufe"]),
+        (
+            DONAU_DE,
+            ["Donau", "Dampf", "Schiff", "Fahrt", "Kapitaen", "Muetze", "Abzeichen"],
+        ),
+        ("Strassenfahrt", ["Strassen", "Fahrt"]),
     ],
 )
 def test_german_transliteration(dictionary, locales, word, expected):
@@ -68,9 +71,12 @@ def test_german_transliteration(dictionary, locales, word, expected):
 @pytest.mark.parametrize(
     "word, expected",
     [
-        ("Einkaufe", EINKAUFE),
-        (DONAU_EN, DONAU),
-        ("Strassenfahrt", STRASSEN),
+        ("Einkaufe", ["Einkaufe"]),
+        (
+            DONAU_EN,
+            ["Donau", "Dampf", "Schiff", "Fahrt", "Kapitan", "Mutze", "Abzeichen"],
+        ),
+        ("Strassenfahrt", ["Strassen", "Fahrt"]),
     ],
 )
 def test_english_transliteration(dictionary, locales, word, expected):
