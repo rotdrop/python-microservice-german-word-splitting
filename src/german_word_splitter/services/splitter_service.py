@@ -10,7 +10,7 @@ from ..errors import (
     TransliterationError,
     UnknownMethodError,
 )
-from ..transliteration import same_transliteration, transliterate
+from ..transliteration import is_configured, transliterate
 
 
 class Backend(Protocol):
@@ -78,7 +78,7 @@ class SplitterService:
         # charsplit output does not depend on the configured locales
         if method != "charsplit" and result != components:
             configured = self._settings.transliteration_locales
-            if not any(same_transliteration(locale, c) for c in configured):
+            if not is_configured(locale, configured):
                 raise TransliterationError(
                     f"Locale {locale} is not configured in "
                     "GERMAN_WORD_SPLITTER_TRANSLITERATION_LOCALES, "

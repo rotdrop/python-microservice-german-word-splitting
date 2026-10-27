@@ -1,35 +1,48 @@
-"""Locale dependent transliteration of German umlauts and ß."""
+"""Locale dependent transliteration through iconv."""
 
 import re
-from typing import Dict
+import subprocess
+from typing import Sequence
 
-# German: ä -> ae, other locales (e.g. en_US, as iconv does): ä -> a.
-# Mirrors the tables of german_compound_splitter.
-_TABLES: Dict[str, Dict[str, str]] = {
-    "de": {"ä": "ae", "ö": "oe", "ü": "ue", "ß": "ss"},
-    "default": {"ä": "a", "ö": "o", "ü": "u", "ß": "ss"},
-}
+from .errors import TransliterationError
 
 
-def _table_name(locale: str) -> str:
-    language = re.split(r"[_\-.@]", locale.strip().lower())[0]
-    return language if language in _TABLES else "default"
+def language(locale: str) -> str:
+    """Language part of a locale name like de_DE, de-AT or en_US.UTF-8."""
+    return re.split(r"[_\-.@]", locale.strip().lower())[0]
 
 
-def same_transliteration(a: str, b: str) -> bool:
-    """Whether both locales transliterate identically."""
-    return _table_name(a) == _table_name(b)
+def is_configured(locale: str, configured: Sequence[str]) -> bool:
+    """Whether the locale is covered by the configured ones (language part only)."""
+    return any(language(locale) == language(c) for c in configured)
+
+
+def _locale_name(locale: str) -> str:
+    name, dot, codeset = locale.strip().partition(".")
+    return f"{name.replace('-', '_')}.{codeset}" if dot else f"{name.replace('-', '_')}.UTF-8"
 
 
 def transliterate(text: str, locale: str) -> str:
-    table = _TABLES[_table_name(locale)]
-    out = []
-    for char in text:
-        repl = table.get(char.lower())
-        if repl is None:
-            out.append(char)
-        elif char.isupper():
-            out.append(repl.capitalize())
-        else:
-            out.append(repl)
-    return "".join(out)
+    """Transliterate text with ``iconv -t ASCII//TRANSLIT`` under the given locale.
+
+    The locale has to be installed on the system, otherwise iconv falls back to
+    the C locale or emits ``?``; the latter is reported as an error.
+    """
+    try:
+        proc = subprocess.run(
+            ["iconv", "-f", "UTF-8", "-t", "ASCII//TRANSLIT"],
+            input=text.encode("utf-8"),
+            capture_output=True,
+            env={"LC_ALL": _locale_name(locale), "PATH": "/usr/bin:/bin"},
+            check=True,
+        )
+    except (OSError, subprocess.CalledProcessError) as exc:
+        raise TransliterationError(
+            f"Unable to transliterate {text} for locale {locale}."
+        ) from exc
+    result = proc.stdout.decode("ascii", errors="replace")
+    if result.count("?") > text.count("?"):
+        raise TransliterationError(
+            f"Locale {locale} is not available for transliteration of {text}."
+        )
+    return result
