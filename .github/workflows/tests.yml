@@ -18,6 +18,10 @@ jobs:
           python-version: ${{ matrix.python-version }}
           cache: pip
           cache-dependency-path: pyproject.toml
+      - name: Generate locales used by the transliteration tests
+        run: |
+          sudo locale-gen de_DE.UTF-8 en_US.UTF-8
+          locale -a
       - name: Install package with test extras
         run: |
           python -m pip install --upgrade pip
