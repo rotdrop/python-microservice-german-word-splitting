@@ -4,7 +4,13 @@ import threading
 from typing import Callable, Dict, List, Optional, Protocol
 
 from ..config import Settings, get_settings
-from ..errors import EmptyWordError, SplitFailedError, UnknownMethodError
+from ..errors import (
+    EmptyWordError,
+    SplitFailedError,
+    TransliterationError,
+    UnknownMethodError,
+)
+from ..transliteration import same_transliteration, transliterate
 
 
 class Backend(Protocol):
@@ -49,17 +55,36 @@ class SplitterService:
                     self._backends[method] = backend
         return backend
 
-    def split(self, word: str, method: str = "charsplit") -> List[str]:
+    def split(
+        self,
+        word: str,
+        method: str = "charsplit",
+        transliterate_to: Optional[str] = None,
+    ) -> List[str]:
         word = word.strip()
         method = method.strip()
+        locale = transliterate_to.strip() if transliterate_to else None
         if not word:
             raise EmptyWordError("Word cannot be empty")
         if method not in self._factories:
             raise UnknownMethodError(f"Unknown method {method}.")
         try:
-            return self._get_backend(method).split(word)
+            components = self._get_backend(method).split(word)
         except Exception as exc:
             raise SplitFailedError(f"Unable to split {word} using {method}.") from exc
+        if not locale:
+            return components
+        result = [transliterate(c, locale) for c in components]
+        # charsplit output does not depend on the configured locales
+        if method != "charsplit" and result != components:
+            configured = self._settings.transliteration_locales
+            if not any(same_transliteration(locale, c) for c in configured):
+                raise TransliterationError(
+                    f"Locale {locale} is not configured in "
+                    "GERMAN_WORD_SPLITTER_TRANSLITERATION_LOCALES, "
+                    f"transliteration of the result of {method} is not reliable."
+                )
+        return result
 
 
 _service: Optional[SplitterService] = None

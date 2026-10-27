@@ -51,3 +51,29 @@ def test_backend_failure_wrapped():
 
     with pytest.raises(SplitFailedError):
         SplitterService(factories={"a": factory}).split("x", "a")
+
+
+def _umlaut_service(locales=()):
+    from german_word_splitter.config import Settings
+
+    backend = type("B", (), {"split": lambda self, w: ["Käse", "Brot"]})()
+    return SplitterService(
+        settings=Settings(transliteration_locales=locales),
+        factories={"charsplit": lambda s: backend, "gcs": lambda s: backend},
+    )
+
+
+def test_transliterate_charsplit_skips_check():
+    assert _umlaut_service().split("x", "charsplit", "de_DE") == ["Kaese", "Brot"]
+
+
+def test_transliterate_unconfigured_locale_fails():
+    from german_word_splitter.errors import TransliterationError
+
+    with pytest.raises(TransliterationError):
+        _umlaut_service(("de_DE",)).split("x", "gcs", "en_US")
+
+
+def test_transliterate_configured_or_unmodified():
+    assert _umlaut_service(("de_AT",)).split("x", "gcs", "de_DE") == ["Kaese", "Brot"]
+    assert _umlaut_service(("en_US",)).split("x", "gcs", "en_GB") == ["Kase", "Brot"]

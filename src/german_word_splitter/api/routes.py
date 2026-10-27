@@ -19,7 +19,7 @@ def split_word(
 ) -> SplitResponse:
     word = request.word.strip()
     try:
-        components = service.split(word, request.method)
+        components = service.split(word, request.method, request.transliterate)
     except SplitterError as exc:
         if exc.__cause__ is not None:
             logger.warning("Split failed: %s", exc, exc_info=exc.__cause__)

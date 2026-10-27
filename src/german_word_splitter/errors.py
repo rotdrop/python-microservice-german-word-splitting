@@ -15,3 +15,7 @@ class UnknownMethodError(SplitterError):
 
 class SplitFailedError(SplitterError):
     """A backend failed to split the word."""
+
+
+class TransliterationError(SplitterError):
+    """The result cannot reliably be transliterated for the requested locale."""

@@ -153,6 +153,13 @@ curl -X POST http://127.0.0.1:8000/split \
 
 An empty word or unknown method yields HTTP 400.
 
+The optional `transliterate` option takes a target locale (e.g. `de_DE`,
+`en_US`); the components are then transliterated accordingly (ä→ae for `de`,
+ä→a for other locales, ß→ss). For `german_compound_splitter`, the locale must
+be configured in `GERMAN_WORD_SPLITTER_TRANSLITERATION_LOCALES` if
+transliteration changes the result, otherwise HTTP 400 is returned. This check
+is skipped for `charsplit`.
+
 The word must be given in its original German spelling, not transliterated
 (`einkäufe`, not `einkaeufe`). The dictionaries only contain the original
 spelling with `ä`, `ö`, `ü` and `ß`, and a transliteration cannot be reliably
