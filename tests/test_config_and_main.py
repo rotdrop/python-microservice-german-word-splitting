@@ -150,3 +150,16 @@ def test_run_uses_tcp_with_auto_port_and_port_file(monkeypatch, tmp_path):
 def test_run_uses_tcp_without_port_file(monkeypatch):
     cfg, port = _run_tcp(monkeypatch, 0, None)
     assert cfg.port == port
+
+
+def test_create_app_refuses_missing_locale(monkeypatch):
+    from german_word_splitter.errors import LocaleNotInstalledError
+
+    monkeypatch.setenv(config.LOCALES_ENV, "xx_YY.UTF-8")
+    with pytest.raises(LocaleNotInstalledError, match="xx_YY"):
+        main.create_app()
+
+
+def test_create_app_accepts_installed_locale(monkeypatch):
+    monkeypatch.setenv(config.LOCALES_ENV, "C.UTF-8")
+    main.create_app()

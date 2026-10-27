@@ -3,10 +3,19 @@
 from fastapi import FastAPI
 
 from .api.routes import router
-from .config import get_port, get_port_file, get_socket, get_socket_mode
+from .config import (
+    get_port,
+    get_port_file,
+    get_socket,
+    get_socket_mode,
+    get_transliteration_locales,
+)
+from .transliteration import check_locales_installed
 
 
 def create_app() -> FastAPI:
+    # Refuse to start if a configured locale is missing.
+    check_locales_installed(get_transliteration_locales())
     app = FastAPI(title="German Compound Splitter Service")
     app.include_router(router)
     return app

@@ -153,6 +153,14 @@ curl -X POST http://127.0.0.1:8000/split \
 
 An empty word or unknown method yields HTTP 400.
 
+The optional `transliterate` option takes a target locale (e.g. `de_DE`,
+`en_US`); the components are then transliterated with
+`iconv -t ASCII//TRANSLIT` under that locale, which therefore has to be
+installed on the system (otherwise HTTP 400). For `german_compound_splitter`, the locale must
+be configured in `GERMAN_WORD_SPLITTER_TRANSLITERATION_LOCALES` (language part compared) if
+transliteration changes the result, otherwise HTTP 400 is returned. This check
+is skipped for `charsplit`.
+
 The word must be given in its original German spelling, not transliterated
 (`einkäufe`, not `einkaeufe`). The dictionaries only contain the original
 spelling with `ä`, `ö`, `ü` and `ß`, and a transliteration cannot be reliably
@@ -170,7 +178,7 @@ make test
 | Variable | Default | Description |
 | --- | --- | --- |
 | `GERMAN_WORD_SPLITTER_DICTIONARY` | `$(VENV)/share/german-word-splitter/german_utf8_linux.dic` (set by `make install`) | Dictionary file used by `german_compound_splitter` (created by `make dictionary`). |
-| `GERMAN_WORD_SPLITTER_TRANSLITERATION_LOCALES` | empty (no transliteration) | Comma- or whitespace-separated locales, e.g. `de_DE.UTF-8,en_US.UTF-8`, read at dictionary load time. Transliterated spellings of dictionary words then also match, so e.g. *Einkaeufe* (`de`: ä→ae, ö→oe, ü→ue) and *Einkaufe* (other locales such as `en_US`: ä→a, ö→o, ü→u) are split like *Einkäufe*; ß→ss in all locales. Only the language part is evaluated. Returned components keep the original dictionary spelling. |
+| `GERMAN_WORD_SPLITTER_TRANSLITERATION_LOCALES` | empty (no transliteration) | Comma- or whitespace-separated locales, e.g. `de_DE.UTF-8,en_US.UTF-8`, read at dictionary load time. Transliterated spellings of dictionary words then also match, so e.g. *Einkaeufe* (`de`: ä→ae, ö→oe, ü→ue) and *Einkaufe* (other locales such as `en_US`: ä→a, ö→o, ü→u) are split like *Einkäufe*; ß→ss in all locales. Only the language part is evaluated. Returned components keep the original dictionary spelling. The locales must be installed on the system, otherwise the service refuses to start. |
 
 ## systemd service
 
