@@ -5,6 +5,7 @@ from dataclasses import dataclass
 
 DICTIONARY_ENV = "GERMAN_WORD_SPLITTER_DICTIONARY"
 FALLBACK_DICTIONARY = "german_utf8_linux.dic"
+LOCALES_ENV = "GERMAN_WORD_SPLITTER_TRANSLITERATION_LOCALES"
 PORT_ENV = "GERMAN_WORD_SPLITTER_PORT"
 SOCKET_ENV = "GERMAN_WORD_SPLITTER_SOCKET"
 PORT_FILE_ENV = "GERMAN_WORD_SPLITTER_PORT_FILE"
@@ -48,10 +49,19 @@ def get_socket_mode() -> int:
     return int(value, 8) if value else FALLBACK_SOCKET_MODE
 
 
+def get_transliteration_locales() -> tuple[str, ...]:
+    """Locales (comma or whitespace separated) used to transliterate the dictionary."""
+    return tuple(os.environ.get(LOCALES_ENV, "").replace(",", " ").split())
+
+
 @dataclass(frozen=True)
 class Settings:
     dictionary_path: str = DEFAULT_DICTIONARY
+    transliteration_locales: tuple[str, ...] = ()
 
 
 def get_settings() -> Settings:
-    return Settings(dictionary_path=os.environ.get(DICTIONARY_ENV, DEFAULT_DICTIONARY))
+    return Settings(
+        dictionary_path=os.environ.get(DICTIONARY_ENV, DEFAULT_DICTIONARY),
+        transliteration_locales=get_transliteration_locales(),
+    )
