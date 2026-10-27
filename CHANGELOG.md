@@ -6,6 +6,8 @@ follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.6.1] - 2026-10-27
+
 ### Changed
 
 - Pin `german_compound_splitter` to v0.1.4 and return components matching the
