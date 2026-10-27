@@ -11,7 +11,7 @@ requires-python = ">=3.13"
 dependencies = [
     "compound-split>=1.0.2",
     "fastapi>=0.100,<1.0",
-    "german_compound_splitter @ git+https://github.com/repodiac/german_compound_splitter.git",
+    "german_compound_splitter @ git+https://github.com/rotdrop/german_compound_splitter.git",
     "uvicorn>=0.23,<1.0",
 ]
 

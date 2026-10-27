@@ -20,7 +20,7 @@ def _make_charsplit(settings: Settings) -> Backend:
 def _make_gcs(settings: Settings) -> Backend:
     from ..backends.gcs_backend import GcsBackend
 
-    return GcsBackend(settings.dictionary_path)
+    return GcsBackend(settings.dictionary_path, settings.transliteration_locales)
 
 
 class SplitterService:

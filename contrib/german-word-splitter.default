@@ -17,3 +17,8 @@
 
 # Dictionary file used by german_compound_splitter.
 #GERMAN_WORD_SPLITTER_DICTIONARY=/opt/german-word-splitter/venv/share/german-word-splitter/german_utf8_linux.dic
+
+# Locales (comma or whitespace separated) for which transliterated spellings of
+# dictionary words are recognized, e.g. Einkaeufe (de_DE) or Einkaufe (en_US)
+# for Einkäufe. Default: empty, i.e. no transliteration.
+#GERMAN_WORD_SPLITTER_TRANSLITERATION_LOCALES=de_DE.UTF-8,en_US.UTF-8

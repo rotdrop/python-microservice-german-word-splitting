@@ -1,6 +1,7 @@
 import importlib
 import os
 
+import pytest
 import uvicorn
 
 from german_word_splitter import config, main
@@ -50,6 +51,22 @@ def test_get_settings_unset_uses_default_dictionary(monkeypatch):
 def test_get_settings_env_overrides_default_dictionary(monkeypatch):
     monkeypatch.setenv(config.DICTIONARY_ENV, "/data/custom.dic")
     assert config.get_settings().dictionary_path == "/data/custom.dic"
+
+
+def test_transliteration_locales_default_empty(monkeypatch):
+    monkeypatch.delenv(config.LOCALES_ENV, raising=False)
+    assert config.get_settings().transliteration_locales == ()
+
+
+@pytest.mark.parametrize(
+    "value", ["de_DE.UTF-8,en_US.UTF-8", "de_DE.UTF-8 en_US.UTF-8", " de_DE.UTF-8, en_US.UTF-8 "]
+)
+def test_transliteration_locales_from_env(monkeypatch, value):
+    monkeypatch.setenv(config.LOCALES_ENV, value)
+    assert config.get_settings().transliteration_locales == (
+        "de_DE.UTF-8",
+        "en_US.UTF-8",
+    )
 
 
 def test_generated_default_module_is_used(monkeypatch):

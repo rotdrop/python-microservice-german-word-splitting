@@ -170,6 +170,7 @@ make test
 | Variable | Default | Description |
 | --- | --- | --- |
 | `GERMAN_WORD_SPLITTER_DICTIONARY` | `$(VENV)/share/german-word-splitter/german_utf8_linux.dic` (set by `make install`) | Dictionary file used by `german_compound_splitter` (created by `make dictionary`). |
+| `GERMAN_WORD_SPLITTER_TRANSLITERATION_LOCALES` | empty (no transliteration) | Comma- or whitespace-separated locales, e.g. `de_DE.UTF-8,en_US.UTF-8`, read at dictionary load time. Transliterated spellings of dictionary words then also match, so e.g. *Einkaeufe* (`de`: ä→ae, ö→oe, ü→ue) and *Einkaufe* (other locales such as `en_US`: ä→a, ö→o, ü→u) are split like *Einkäufe*; ß→ss in all locales. Only the language part is evaluated. Returned components keep the original dictionary spelling. |
 
 ## systemd service
 
