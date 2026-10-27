@@ -41,14 +41,14 @@ def dictionary(tmp_path):
     ],
 )
 @pytest.mark.parametrize(
-    "locales", [(), ("de_DE.UTF-8",), ("en_US.UTF-8",), ("de_DE.UTF-8", "en_US.UTF-8")]
+    "locales", [(), ("de_DE",), ("en_US.UTF-8",), ("de_DE.UTF-8", "en_US.UTF-8")]
 )
 def test_original_spelling_with_any_locales(dictionary, locales, word, expected):
     assert GcsBackend(dictionary, locales).split(word) == expected
 
 
 @pytest.mark.parametrize(
-    "locales", [("de_DE.UTF-8",), ("de_DE.UTF-8", "en_US.UTF-8"), ("en_US.UTF-8", "de_DE.UTF-8")]
+    "locales", [("de_DE",), ("de_DE.UTF-8",), ("de_DE", "en_US"), ("en_US", "de_DE.UTF-8")]
 )
 @pytest.mark.parametrize(
     "word, expected",
@@ -63,7 +63,7 @@ def test_german_transliteration(dictionary, locales, word, expected):
 
 
 @pytest.mark.parametrize(
-    "locales", [("en_US.UTF-8",), ("de_DE.UTF-8", "en_US.UTF-8")]
+    "locales", [("en_US",), ("en_US.UTF-8",), ("de_DE", "en_US.UTF-8")]
 )
 @pytest.mark.parametrize(
     "word, expected",
@@ -91,5 +91,5 @@ def test_transliteration_is_off_by_default(dictionary, word, expected):
 
 
 def test_locale_specific_forms_are_not_mixed(dictionary):
-    assert GcsBackend(dictionary, ("de_DE.UTF-8",)).split("Einkaufe") == ["Einkaufe"]
-    assert GcsBackend(dictionary, ("en_US.UTF-8",)).split("Einkaeufe") == ["Einkaeufe"]
+    assert GcsBackend(dictionary, ("de_DE",)).split("Einkaufe") == ["Einkaufe"]
+    assert GcsBackend(dictionary, ("en_US",)).split("Einkaeufe") == ["Einkaeufe"]
