@@ -253,14 +253,14 @@ version is taken from `contrib/debian/changelog`.
 
 #### Signed apt repository
 
-Release builds for Debian 13 (suite `trixie`) and Ubuntu 26.04 (`resolute`), each for
+Release builds for Debian 13 (suite `trixie`) and Ubuntu 26.04 (`resolute`) and 26.10 (`stonking`), each for
 amd64 and arm64, are published as a signed apt
 repository on GitHub Pages by the `APT repository` workflow (on `v*` tags or manual start).
 The suite is the distribution codename, because the package bundles a virtual environment tied to the
 release's Python. Add the repository with
 
 ```sh
-make install-apt-source          # uses sudo; supports trixie and resolute (or set APT_SUITE explicitly)
+make install-apt-source          # uses sudo; supports trixie, resolute and stonking (or set APT_SUITE explicitly)
 sudo apt update
 sudo apt install german-word-splitter
 ```
