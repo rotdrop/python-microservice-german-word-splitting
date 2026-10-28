@@ -28,7 +28,7 @@ RPM_DIR := $(BUILD_DIR)/rpm
 ARCH_DIR := $(BUILD_DIR)/arch
 APT_URI ?= https://rotdrop.github.io/python-microservice-german-word-splitting
 APT_SUITE ?= $(shell . /etc/os-release; echo $$VERSION_CODENAME)
-APT_SUPPORTED_SUITES := trixie resolute
+APT_SUPPORTED_SUITES := trixie resolute stonking
 APT_KEYRING_DIR ?= /etc/apt/keyrings
 APT_SOURCES_DIR ?= /etc/apt/sources.list.d
 VENV_OPTIONS := $(if $(filter 1 true yes,$(SYSTEM_SITE_PACKAGES)),--system-site-packages,)
@@ -55,7 +55,7 @@ help:
 		'  rpm-clean        Remove $(RPM_DIR)/.' \
 		'  arch             Build the Arch Linux package from contrib/arch into $(ARCH_DIR)/ (makepkg).' \
 		'  arch-clean       Remove $(ARCH_DIR)/.' \
-		'  install-apt-source    Add the project apt repository for Debian trixie or Ubuntu resolute (uses sudo).' \
+		'  install-apt-source    Add the project apt repository for Debian trixie or Ubuntu resolute/stonking (uses sudo).' \
 		'  uninstall-apt-source  Remove the apt repository configuration and key again.' \
 		'  uninstall    Remove the virtual environment and dictionary files.' \
 		'  clean        Remove the build/ directory with the download artifacts; keeps the virtual environment.' \
@@ -198,7 +198,7 @@ arch:
 arch-clean:
 	rm -rf $(ARCH_DIR)
 
-# Register the signed apt repository for Debian trixie or Ubuntu resolute (deb822 format).
+# Register the signed apt repository for Debian trixie or Ubuntu resolute/stonking (deb822 format).
 install-apt-source:
 	@case " $(APT_SUPPORTED_SUITES) " in *" $(APT_SUITE) "*) ;; \
 		*) echo "Unsupported APT suite '$(APT_SUITE)'; supported suites: $(APT_SUPPORTED_SUITES)" >&2; exit 1;; esac
