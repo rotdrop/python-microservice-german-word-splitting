@@ -26,7 +26,7 @@ fi
 tag="v$version"
 package_version=$(sed -n 's/^version = "\(.*\)"/\1/p' pyproject.toml)
 if [[ $package_version != "$version" ]] ||
-  ! head -1 CHANGELOG.md | grep -Fq "## [$version] -" ||
+    ! grep -m1 -F "## [" CHANGELOG.md | grep -Fq "## [$version] -" ||
   ! head -1 contrib/debian/changelog | grep -Fq "($version)" ||
   ! grep -Fxq "Version:        $version" contrib/rpm/german-word-splitter.spec ||
   ! grep -Fxq "pkgver=$version" contrib/arch/PKGBUILD; then
