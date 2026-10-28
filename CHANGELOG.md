@@ -6,6 +6,16 @@ follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- `GET /info` (alias `/config`) returning version, default method and
+  configured transliteration locales.
+- `gcs` as shorthand for the `german_compound_splitter` method.
+
+### Changed
+
+- The default split method is now `gcs` instead of `charsplit`.
+
 ## [0.6.1] - 2026-10-27
 
 ### Changed

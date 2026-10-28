@@ -13,6 +13,10 @@ from ..errors import (
 from ..transliteration import is_configured, transliterate
 
 
+DEFAULT_METHOD = "gcs"
+METHOD_ALIASES = {"gcs": "german_compound_splitter"}
+
+
 class Backend(Protocol):
     def split(self, word: str) -> List[str]: ...
 
@@ -58,11 +62,13 @@ class SplitterService:
     def split(
         self,
         word: str,
-        method: str = "charsplit",
+        method: str = DEFAULT_METHOD,
         transliterate_to: Optional[str] = None,
     ) -> List[str]:
         word = word.strip()
         method = method.strip()
+        if method not in self._factories:
+            method = METHOD_ALIASES.get(method, method)
         locale = transliterate_to.strip() if transliterate_to else None
         if not word:
             raise EmptyWordError("Word cannot be empty")
