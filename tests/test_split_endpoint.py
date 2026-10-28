@@ -78,7 +78,7 @@ def test_real_german_compound_splitter_preserves_transliterated_input(real_gcs_c
 
 
 def test_transliterate_option(client):
-    r = client.post("/split", json={"word": "Haustür", "transliterate": "C.UTF-8"})
+    r = client.post("/split", json={"word": "Haustür", "method": "charsplit", "transliterate": "C.UTF-8"})
     assert r.status_code == 200
     assert r.json()["components"] == ["Haus", "Tur"]
 
@@ -94,4 +94,19 @@ def test_transliterate_unconfigured_locale_is_rejected(client):
 
 def test_split_failure_is_logged_and_rejected(client, service):
     service._factories["charsplit"] = lambda s: (_ for _ in ()).throw(RuntimeError("boom"))
-    assert client.post("/split", json={"word": "Haustür"}).status_code == 400
+    r = client.post("/split", json={"word": "Haustür", "method": "charsplit"})
+    assert r.status_code == 400
+
+
+def test_gcs_alias_and_default(client):
+    assert client.post("/split", json={"word": "Haustür", "method": "gcs"}).status_code == 200
+    assert client.post("/split", json={"word": "Haustür"}).status_code == 200
+
+
+def test_info(client, monkeypatch):
+    monkeypatch.setenv("GERMAN_WORD_SPLITTER_TRANSLITERATION_LOCALES", "de_DE en_US")
+    for path in ("/info", "/config"):
+        body = client.get(path).json()
+        assert body["default_method"] == "gcs"
+        assert body["transliteration_locales"] == ["de_DE", "en_US"]
+        assert body["version"]

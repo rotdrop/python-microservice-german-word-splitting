@@ -138,8 +138,11 @@ Or directly with uvicorn: `uvicorn german_word_splitter.main:app --uds /path/to.
 
 ## API
 
-`POST /split` with `word` and optional `method` (`charsplit` (default) or
-`german_compound_splitter`).
+`POST /split` with `word` and optional `method` (`gcs` (default; alias of
+`german_compound_splitter`) or `charsplit`).
+
+`GET /info` (alias `/config`) returns the service `version`, the
+`default_method` and the configured `transliteration_locales`.
 
 ```sh
 curl -X POST http://127.0.0.1:8000/split \
