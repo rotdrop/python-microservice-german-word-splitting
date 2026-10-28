@@ -4,14 +4,14 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "python-microservice-german-word-splitting"
-version = "0.7.0"
+version = "0.7.1"
 description = "FastAPI microservice for splitting German compound words"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "compound-split>=1.0.2",
     "fastapi>=0.100,<1.0",
-    "german_compound_splitter @ git+https://github.com/rotdrop/german_compound_splitter.git@v0.1.4",
+    "german_compound_splitter @ git+https://github.com/rotdrop/german_compound_splitter.git@v0.1.5",
     "uvicorn>=0.23,<1.0",
 ]
 
