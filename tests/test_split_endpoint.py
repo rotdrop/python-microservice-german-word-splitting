@@ -29,7 +29,7 @@ def test_real_charsplit_contract():
 
     from german_word_splitter.main import app
 
-    r = TestClient(app).post("/split", json={"word": "Haustür"})
+    r = TestClient(app).post("/split", json={"word": "Haustür", "method": "charsplit"})
     assert r.status_code == 200
     assert set(r.json()) == {"word", "splittable", "components"}
 
