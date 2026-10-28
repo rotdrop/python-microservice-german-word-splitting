@@ -21,4 +21,6 @@
 # Locales (comma or whitespace separated) for which transliterated spellings of
 # dictionary words are recognized, e.g. Einkaeufe (de_DE) or Einkaufe (en_US)
 # for Einkäufe. Default: empty, i.e. no transliteration.
+# When the input appears transliterated, its components are returned using the
+# same transliteration conventions.
 #GERMAN_WORD_SPLITTER_TRANSLITERATION_LOCALES=de_DE.UTF-8,en_US.UTF-8
